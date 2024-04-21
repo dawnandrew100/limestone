@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "limestone"
+version = "0.0.1"
+authors = [
+	{ name ="Andrew Hennis", email="andrew.mr.hennis@gmail.com" },
+]
+desctiption = "Simple python implementation of text alignment and phylo tree creation"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/dawnandrew100/limestone"
+Issues = "https://github.com/dawnandrew100/limestone/issues"
