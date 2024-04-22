@@ -1,83 +1,45 @@
-#test sequences
-querySequence = "HAMWATER"
-subjectSequence = "HAMBURGERBWATERREADBUNONICENEARAWATERTREEOFBETHLEHEMWATER"
+from __future__ import annotations
+import numpy as np
 
-def main(): #all options for each alignment
-  NeedlemanWunsch = needleman_wunsch()
-  print(NeedlemanWunsch.align(querySequence,subjectSequence))
-  print(NeedlemanWunsch.distance(querySequence,subjectSequence))
-  print(NeedlemanWunsch.normalized_distance(querySequence,subjectSequence))
-  print(NeedlemanWunsch.similarity(querySequence,subjectSequence))
-  print(NeedlemanWunsch.normalized_similarity(querySequence,subjectSequence))
-  print(f"Needleman-Wunsch matrix for {querySequence} & {subjectSequence}:\n"
-        f"{NeedlemanWunsch.scoreMatrix(querySequence,subjectSequence)}\n")
+def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
+  return sequence + [fillvalue] * (n - len(sequence)) 
 
-  Levenshtein = levenshtein()
-  print(Levenshtein.align(querySequence,subjectSequence))
-  print(Levenshtein.distance(querySequence,subjectSequence))
-  print(Levenshtein.normalized_distance(querySequence,subjectSequence))
-  print(Levenshtein.similarity(querySequence,subjectSequence))
-  print(Levenshtein.normalized_similarity(querySequence,subjectSequence))
-  print(f"Levenshtein matrix for {querySequence} & {subjectSequence}:\n"
-        f"{Levenshtein.scoreMatrix(querySequence,subjectSequence)}\n")
-
-  WaterSmithB = waterman_smith_beyer()
-  print(WaterSmithB.align(querySequence,subjectSequence))
-  print(WaterSmithB.distance(querySequence,subjectSequence))
-  print(WaterSmithB.normalized_distance(querySequence,subjectSequence))
-  print(WaterSmithB.similarity(querySequence,subjectSequence))
-  print(WaterSmithB.normalized_similarity(querySequence,subjectSequence))
-  print(f"Waterman-Smith-Beyer matrix for {querySequence} & {subjectSequence}:\n"
-        f"{WaterSmithB.scoreMatrix(querySequence,subjectSequence)}\n")
-
-  SmithWaterman = smith_waterman()
-  print(SmithWaterman.align(querySequence,subjectSequence))
-  print(SmithWaterman.distance(querySequence,subjectSequence))
-  print(SmithWaterman.normalized_distance(querySequence,subjectSequence))
-  print(SmithWaterman.similarity(querySequence,subjectSequence))
-  print(SmithWaterman.normalized_similarity(querySequence,subjectSequence))
-  print(f"Smith-Waterman matrix for {querySequence} & {subjectSequence}:\n"
-        f"{SmithWaterman.scoreMatrix(querySequence,subjectSequence)}") 
-
-def ljustlist(self, n, fillvalue=''):
-  return self + [fillvalue] * (n - len(self)) 
-
-def rjustlist(self, fillvalue=''):
-  return [fillvalue] + self
+def rjustlist(sequence: list[str], fillvalue='')->list[str]:
+  return [fillvalue] + sequence
 
 class _BASE():
   @staticmethod
-  def maximum(querySequence, subjectSequence):
+  def maximum(querySequence: str|list[str], subjectSequence: str|list[str])->int:
       sequences = [querySequence,subjectSequence]
       return max(map(len, sequences))
 
-  def scoreMatrix(self, querySequence, subjectSequence):
+  def scoreMatrix(self, querySequence: str|list[str], subjectSequence: str|list[str])->list[list[int]]:
     matrix, _ = self(querySequence, subjectSequence)
     return matrix
 
 class _GLOBALBASE(_BASE):  
-  def distance(self, querySequence, subjectSequence):
+  def distance(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     matrix, _ = self(querySequence, subjectSequence)
     return matrix[matrix.shape[0]-1,matrix.shape[1]-1]
 
-  def similarity(self, querySequence, subjectSequence):
+  def similarity(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     subject_gap = self.gap_penalty*len(subjectSequence)
     query_gap = self.gap_penalty*len(querySequence)
     return (max(subject_gap,query_gap)-1) - self.distance(querySequence, subjectSequence)
 
-  def normalized_distance(self, querySequence, subjectSequence):
+  def normalized_distance(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     dist = self.distance(querySequence, subjectSequence)
     subject_gap = self.gap_penalty*len(subjectSequence)
     query_gap = self.gap_penalty*len(querySequence)
     return dist/(max(subject_gap,query_gap)-1)
 
-  def normalized_similarity(self, querySequence, subjectSequence):
+  def normalized_similarity(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     similarity = self.similarity(querySequence, subjectSequence)
     subject_gap = self.gap_penalty*len(subjectSequence)
     query_gap = self.gap_penalty*len(querySequence)
     return similarity/(max(subject_gap,query_gap)-1)
 
-  def align(self, querySequence, subjectSequence): 
+  def align(self, querySequence: str|list[str], subjectSequence: str|list[str])->str: 
     #currently only used for Needleman Wunsch
     querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
     _, pointerMatrix = self(querySequence, subjectSequence)
@@ -113,26 +75,26 @@ class _GLOBALBASE(_BASE):
 
 class _LOCALBASE(_BASE):
   #All local base functions currently only used by Smith Waterman
-  def similarity(self, querySequence,subjectSequence):
+  def similarity(self, querySequence: str|list[str],subjectSequence: str|list[str])->int:
     scoreMatrix, _ = self(querySequence, subjectSequence)
     return scoreMatrix.max()
 
-  def distance(self, querySequence, subjectSequence):
+  def distance(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     matrix, _ = self(querySequence, subjectSequence)
     sequences = [querySequence,subjectSequence]
     return max(map(len, sequences)) - self.similarity(querySequence, subjectSequence)
 
-  def normalized_distance(self, querySequence, subjectSequence):
+  def normalized_distance(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     dist = self.distance(querySequence, subjectSequence)
     sequences = [querySequence,subjectSequence]
     return dist/max(map(len, sequences))
 
-  def normalized_similarity(self, querySequence, subjectSequence):
+  def normalized_similarity(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     similarity = self.similarity(querySequence, subjectSequence)
     sequences = [querySequence,subjectSequence]
     return similarity/max(map(len, sequences))
 
-  def align(self, querySequence, subjectSequence):
+  def align(self, querySequence: str|list[str], subjectSequence: str|list[str])->str:
     querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
     scoreMatrix, pointerMatrix = self(querySequence, subjectSequence)
 
@@ -181,12 +143,12 @@ class _LOCALBASE(_BASE):
     return f"{queryAlign.replace(' ','')}\n{subjectAlign.replace(' ','')}"
     
 class needleman_wunsch(_GLOBALBASE):
-  def __init__(self, match_score = 0, mismatch_penalty = 1, gap_penalty = 2):
+  def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
     self.match_score = match_score
     self.mismatch_penalty = mismatch_penalty
     self.gap_penalty = gap_penalty
 
-  def __call__(self, querySequence, subjectSequence):
+  def __call__(self, querySequence: str|list[str], subjectSequence: str|list[str])->tuple[int,int]:
     querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
     subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence) 
     #matrix initialisation
@@ -232,12 +194,12 @@ class levenshtein(needleman_wunsch):
     self.gap_penalty = 1
       
 class smith_waterman(_LOCALBASE):
-  def __init__(self, match_score = 1, mismatch_penalty = 1, gap_penalty = 2):
+    def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
     self.match_score = match_score
     self.mismatch_penalty = mismatch_penalty
     self.gap_penalty = gap_penalty
 
-  def __call__(self, subjectSequence, querySequence):
+  def __call__(self, subjectSequence: str|list[str], querySequence: str|list[str])->tuple[int,int]:
     querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
     subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence) 
     #matrix initialisation
@@ -274,30 +236,30 @@ class smith_waterman(_LOCALBASE):
     return self.matrix_score, self.pointer
 
 class waterman_smith_beyer(_GLOBALBASE):
-  def __init__(self, match_score = 0, mismatch_penalty = 1, new_gap_penalty = 3, continue_gap_penalty = 1):
+    def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 3, continue_gap_penalty:int = 1)->None:
     self.match_score = match_score
     self.mismatch_penalty = mismatch_penalty
     self.new_gap_penalty = new_gap_penalty
     self.continue_gap_penalty = continue_gap_penalty
 
-  def similarity(self, querySequence, subjectSequence):
+  def similarity(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     subject_gap = self.new_gap_penalty + self.continue_gap_penalty*len(subjectSequence)
     query_gap = self.new_gap_penalty + self.continue_gap_penalty*len(querySequence)
     return (max(subject_gap,query_gap)) - self.distance(querySequence, subjectSequence)
 
-  def normalized_distance(self, querySequence, subjectSequence):
+  def normalized_distance(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     dist = self.distance(querySequence, subjectSequence)
     subject_gap = self.new_gap_penalty + self.continue_gap_penalty*len(subjectSequence)
     query_gap = self.new_gap_penalty + self.continue_gap_penalty*len(querySequence)
     return dist/(max(subject_gap,query_gap))
 
-  def normalized_similarity(self, querySequence, subjectSequence):
+  def normalized_similarity(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
     similarity = self.similarity(querySequence, subjectSequence)
     subject_gap = self.new_gap_penalty + self.continue_gap_penalty*len(subjectSequence)
     query_gap = self.new_gap_penalty + self.continue_gap_penalty*len(querySequence)
     return similarity/(max(subject_gap,query_gap))
 
-  def __call__(self, querySequence, subjectSequence):
+  def __call__(self, querySequence: str|list[str], subjectSequence: str|list[str])->tuple[int, int]:
     querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
     subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence) 
     #matrix initialisation
@@ -342,7 +304,7 @@ class waterman_smith_beyer(_GLOBALBASE):
 
     return self.matrix_score, self.pointer
 
-def frontWhiteSpace(querySequence, subjectSequence):   
+def frontWhiteSpace(querySequence: str|list[str], subjectSequence: str|list[str])->tuple[str|list,str|list]:   
   #adds leading white space so that matrix works
   try:
     subjectSequence = subjectSequence.rjust(len(subjectSequence)+1)
@@ -351,6 +313,3 @@ def frontWhiteSpace(querySequence, subjectSequence):
     subjectSequence = rjustlist(subjectSequence)
     querySequence = rjustlist(querySequence)
   return subjectSequence, querySequence
-
-if __name__ == "__main__":
-  main()
