@@ -1,6 +1,15 @@
 from __future__ import annotations
 import numpy as np
 
+def main():
+    needlemanWunsch = needleman_wunsch()
+    watermanSmithBeyer = waterman_smith_beyer()
+    smithWaterman = smith_waterman()
+
+    print(needlemanWunsch.align("ACTG","ATG"))
+    print(watermanSmithBeyer.align("ACTG","ATG"))
+    print(smithWaterman.align("ACTG","ATG"))
+
 def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
   return sequence + [fillvalue] * (n - len(sequence)) 
 
@@ -194,7 +203,7 @@ class levenshtein(needleman_wunsch):
     self.gap_penalty = 1
       
 class smith_waterman(_LOCALBASE):
-    def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
+  def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
     self.match_score = match_score
     self.mismatch_penalty = mismatch_penalty
     self.gap_penalty = gap_penalty
@@ -236,7 +245,7 @@ class smith_waterman(_LOCALBASE):
     return self.matrix_score, self.pointer
 
 class waterman_smith_beyer(_GLOBALBASE):
-    def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 3, continue_gap_penalty:int = 1)->None:
+  def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 3, continue_gap_penalty:int = 1)->None:
     self.match_score = match_score
     self.mismatch_penalty = mismatch_penalty
     self.new_gap_penalty = new_gap_penalty
@@ -313,3 +322,6 @@ def frontWhiteSpace(querySequence: str|list[str], subjectSequence: str|list[str]
     subjectSequence = rjustlist(subjectSequence)
     querySequence = rjustlist(querySequence)
   return subjectSequence, querySequence
+
+if __name__ == "__main__":
+    main()
