@@ -1,11 +1,11 @@
 from __future__ import annotations
-import numpy as np
+try:
+    # external dependency
+    import numpy as np
+except ImportError:
+    numpy = None  
 
 def main():
-    needlemanWunsch = needleman_wunsch()
-    watermanSmithBeyer = waterman_smith_beyer()
-    smithWaterman = smith_waterman()
-
     print(needlemanWunsch.align("ACTG","ATG"))
     print(watermanSmithBeyer.align("ACTG","ATG"))
     print(smithWaterman.align("ACTG","ATG"))
@@ -322,6 +322,11 @@ def frontWhiteSpace(querySequence: str|list[str], subjectSequence: str|list[str]
     subjectSequence = rjustlist(subjectSequence)
     querySequence = rjustlist(querySequence)
   return subjectSequence, querySequence
+
+
+needlemanWunsch = needleman_wunsch()
+watermanSmithBeyer = waterman_smith_beyer()
+smithWaterman = smith_waterman()
 
 if __name__ == "__main__":
     main()
