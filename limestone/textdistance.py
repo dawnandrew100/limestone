@@ -350,7 +350,7 @@ def frontWhiteSpace(querySequence: list[str], subjectSequence: list[str])->tuple
 needlemanWunsch = needleman_wunsch()
 watermanSmithBeyer = waterman_smith_beyer()
 smithWaterman = smith_waterman()
-levenshteiN = levenshtein()
+levenshteinDist = levenshtein()
 
 if __name__ == "__main__":
     main()
