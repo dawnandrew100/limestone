@@ -270,23 +270,6 @@ class waterman_smith_beyer(_GLOBALBASE):
       self.new_gap_penalty = new_gap_penalty
       self.continue_gap_penalty = continue_gap_penalty
 
-  def similarity(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
-      subject_gap = self.new_gap_penalty + self.continue_gap_penalty*len(subjectSequence)
-      query_gap = self.new_gap_penalty + self.continue_gap_penalty*len(querySequence)
-      return (max(subject_gap,query_gap)) - self.distance(querySequence, subjectSequence)
-
-  def normalized_distance(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
-      dist = self.distance(querySequence, subjectSequence)
-      subject_gap = self.new_gap_penalty + self.continue_gap_penalty*len(subjectSequence)
-      query_gap = self.new_gap_penalty + self.continue_gap_penalty*len(querySequence)
-      return dist/(max(subject_gap,query_gap))
-
-  def normalized_similarity(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
-      similarity = self.similarity(querySequence, subjectSequence)
-      subject_gap = self.new_gap_penalty + self.continue_gap_penalty*len(subjectSequence)
-      query_gap = self.new_gap_penalty + self.continue_gap_penalty*len(querySequence)
-      return similarity/(max(subject_gap,query_gap))
-
   def __call__(self, querySequence: str|list[str], subjectSequence: str|list[str])->tuple[int, int]:
       if isinstance(subjectSequence, str):
           querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
