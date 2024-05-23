@@ -1,2 +1,0 @@
-#app
-from .textdistance import *
