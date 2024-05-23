@@ -1,19 +1,9 @@
 from __future__ import annotations
 try:
     # external dependency
-    import numpy as np
+    import numpy
 except ImportError:
     numpy = None  
-
-ss = "TRQWCGUUSC"
-qs = "PTOKXKBFVD"
-
-def main():
-    print(smithWaterman.similarity("ACTG","FHYU"))
-    print(smithWaterman.distance("ACTG","FHYU"))
-    print(needlemanWunsch.similarity("ACTG","FHYU"))
-    print(needlemanWunsch.distance("ACTG","FHYU"))
-    #print(watermanSmithBeyer.align("ACTG","ATG"))
 
 def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
   return sequence + [fillvalue] * (n - len(sequence)) 
@@ -119,7 +109,7 @@ class _LOCALBASE(_BASE):
       return "There is no local alignment!"
 
     #finds the largest value closest to bottom right of matrix
-    i, j = list(np.where(scoreMatrix == scoreMatrix.max()))
+    i, j = list(numpy.where(scoreMatrix == scoreMatrix.max()))
     i, j = i[-1], j[-1]
 
     subjectAlign = []
@@ -166,6 +156,9 @@ class needleman_wunsch(_GLOBALBASE):
     self.gap_penalty = gap_penalty
 
   def __call__(self, querySequence: str|list[str], subjectSequence: str|list[str])->tuple[int,int]:
+      if not numpy:
+          raise ImportError('Please pip install numpy!')
+      
       if isinstance(subjectSequence, str):
           querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
           querySequence = [x for x in querySequence]
@@ -176,9 +169,9 @@ class needleman_wunsch(_GLOBALBASE):
       subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence) 
 
       #matrix initialisation
-      self.alignment_score = np.zeros((len(subjectSequence),len(querySequence)))
+      self.alignment_score = numpy.zeros((len(subjectSequence),len(querySequence)))
       #pointer matrix to trace optimal alignment
-      self.pointer = np.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
+      self.pointer = numpy.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
       self.pointer[:,0] = 3
       self.pointer[0,:] = 4
       #first row and column of matrix consisting of gap scores
@@ -224,6 +217,9 @@ class smith_waterman(_LOCALBASE):
     self.gap_penalty = gap_penalty
 
   def __call__(self, subjectSequence: str|list[str], querySequence: str|list[str])->tuple[int,int]: 
+      if not numpy:
+          raise ImportError('Please pip install numpy!')
+      
       if isinstance(subjectSequence, str):
           querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
           querySequence = [x for x in querySequence]
@@ -231,9 +227,9 @@ class smith_waterman(_LOCALBASE):
 
       subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence) 
       #matrix initialisation
-      self.alignment_score = np.zeros((len(subjectSequence),len(querySequence))) 
+      self.alignment_score = numpy.zeros((len(subjectSequence),len(querySequence))) 
       #pointer to trace optimal alignment
-      self.pointer = np.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
+      self.pointer = numpy.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
       self.pointer[:,0] = 3
       self.pointer[0,:] = 4
 
@@ -271,6 +267,9 @@ class waterman_smith_beyer(_GLOBALBASE):
       self.continue_gap_penalty = continue_gap_penalty
 
   def __call__(self, querySequence: str|list[str], subjectSequence: str|list[str])->tuple[int, int]:
+      if not numpy:
+          raise ImportError('Please pip install numpy!')
+      
       if isinstance(subjectSequence, str):
           querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
           querySequence = [x for x in querySequence]
@@ -281,9 +280,9 @@ class waterman_smith_beyer(_GLOBALBASE):
       subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence)
       
       #matrix initialisation
-      self.alignment_score = np.zeros((len(subjectSequence),len(querySequence)))
+      self.alignment_score = numpy.zeros((len(subjectSequence),len(querySequence)))
       #pointer matrix to trace optimal alignment
-      self.pointer = np.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
+      self.pointer = numpy.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
       self.pointer[:,0] = 3
       self.pointer[0,:] = 4
       #first row and column of matrix consisting of gap scores
@@ -329,11 +328,7 @@ def frontWhiteSpace(querySequence: list[str], subjectSequence: list[str])->tuple
 
     return subjectSequence, querySequence
 
-
 needlemanWunsch = needleman_wunsch()
 watermanSmithBeyer = waterman_smith_beyer()
 smithWaterman = smith_waterman()
 levenshteinDist = levenshtein()
-
-if __name__ == "__main__":
-    main()
