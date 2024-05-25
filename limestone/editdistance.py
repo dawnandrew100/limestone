@@ -5,6 +5,9 @@ try:
 except ImportError:
     numpy = None  
 
+def main():
+    print(needlemanWunsch.align("AGTACGCA","TATGC"))
+
 def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
   return sequence + [fillvalue] * (n - len(sequence)) 
 
@@ -321,6 +324,7 @@ class waterman_smith_beyer(_GLOBALBASE):
   
       return self.alignment_score, self.pointer
 
+
 def frontWhiteSpace(querySequence: list[str], subjectSequence: list[str])->tuple[list[str],list[str]]: 
     #adds leading white space so that matrix works
     subjectSequence = rjustlist(subjectSequence)
@@ -332,3 +336,6 @@ needlemanWunsch = needleman_wunsch()
 watermanSmithBeyer = waterman_smith_beyer()
 smithWaterman = smith_waterman()
 levenshteinDist = levenshtein()
+
+if __name__ == "__main__":
+    main()
