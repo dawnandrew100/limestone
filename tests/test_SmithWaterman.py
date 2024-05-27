@@ -39,6 +39,10 @@ class TestWatermanSmithBayer(unittest.TestCase):
     def test_align(self):
         alignment = editdistance.smithWaterman.align("BA", "ABA")
         self.assertEqual(alignment, "BA\nBA")
+    
+    def test_align2(self):
+        alignment = editdistance.smithWaterman.align("AGTACGCA","TATGC")
+        self.assertEqual(alignment, "TACGC\nTATGC")
 
 if __name__ == '__main__':
     unittest.main()

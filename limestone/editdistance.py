@@ -6,7 +6,7 @@ except ImportError:
     numpy = None  
 
 def main():
-    print(needlemanWunsch.align("AGTACGCA","TATGC"))
+    print(smithWaterman.align("AGTACGCA","TATGC"))
 
 def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
   return sequence + [fillvalue] * (n - len(sequence)) 
@@ -54,37 +54,37 @@ class _GLOBALBASE(_BASE):
       subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence)
       i = len(querySequence)+1
       j = len(subjectSequence)+1
-      subjectAlign = []
-      queryAlign= []
+      subjectAlign = ""
+      queryAlign= ""
       subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence)
       
       while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
         if pointerMatrix[i,j] in [2, 5, 6, 9]:
             #appends match/mismatch then moves to the cell diagonally up and to the left
-            queryAlign.append(querySequence[j-1])
-            subjectAlign.append(subjectSequence[i-1])
+            queryAlign = querySequence[j-1] + queryAlign
+            subjectAlign = subjectSequence[i-1] + subjectAlign
             i -= 1
             j -= 1
         elif pointerMatrix[i,j] in [3, 5, 7, 9]:
             #appends gap and accompanying nucleotide, then moves to the cell to the left
-            subjectAlign.append(subjectSequence[i-1])
-            queryAlign.append('-')
+            subjectAlign = subjectSequence[i-1] +subjectAlign
+            queryAlign = '-' +queryAlign
             i -= 1
         elif pointerMatrix[i,j] in [4, 6, 7, 9]:
             #appends gap and accompanying nucleotide, then moves to the cell above
-            subjectAlign.append('-')
-            queryAlign.append(querySequence[j-1])
+            subjectAlign = '-' + subjectAlign
+            queryAlign = querySequence[j-1] + queryAlign
             j -= 1
-      # Reverses the strings
-      subjectAlign = ''.join(subjectAlign)[::-1]
-      queryAlign= ''.join(queryAlign)[::-1]
-      '\n'.join([subjectAlign, queryAlign])
       return f"{queryAlign}\n{subjectAlign}"
 
 class _LOCALBASE(_BASE):
   #All local base functions currently only used by Smith Waterman
+  def scoreMatrix(self, querySequence: str|list[str], subjectSequence: str|list[str])->list[list[int]]:
+    matrix = self(querySequence, subjectSequence)
+    return matrix
+  
   def similarity(self, querySequence: str|list[str],subjectSequence: str|list[str])->int:
-    scoreMatrix, _ = self(querySequence, subjectSequence)
+    scoreMatrix  = self(querySequence, subjectSequence)
     return scoreMatrix.max()
 
   def distance(self, querySequence: str|list[str], subjectSequence: str|list[str])->int:
@@ -103,7 +103,7 @@ class _LOCALBASE(_BASE):
 
   def align(self, querySequence: str|list[str], subjectSequence: str|list[str])->str:
     querySequence,subjectSequence = map(lambda x: x.upper(), [querySequence,subjectSequence])
-    scoreMatrix, pointerMatrix = self(querySequence, subjectSequence)
+    scoreMatrix = self(querySequence, subjectSequence)
 
     querySequence = [x for x in querySequence]
     subjectSequence = [x for x in subjectSequence]
@@ -115,40 +115,18 @@ class _LOCALBASE(_BASE):
     i, j = list(numpy.where(scoreMatrix == scoreMatrix.max()))
     i, j = i[-1], j[-1]
 
-    subjectAlign = []
-    queryAlign= []
-    qtemp = ''
-    stemp = ''
+    subjectAlign = ""
+    queryAlign= ""
+    score = scoreMatrix.max()
 
-    while i > 0 and j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
-      if pointerMatrix[i,j] in [2, 5, 6, 9]:
-          #appends match/mismatch then moves to the cell diagonally up and to the left
-          queryAlign.append(querySequence[j-1])
-          subjectAlign.append(subjectSequence[i-1])
-          queryAlign.append(qtemp)
-          subjectAlign.append(stemp)
-          qtemp = ''
-          stemp = ''
-          i -= 1
-          j -= 1
-      elif pointerMatrix[i,j] in [4, 6, 7, 9]:
-          #appends gap and accompanying nucleotide, then moves to the cell to the left
-          queryAlign.append(querySequence[j-1])
-          stemp = '-'
-          j -= 1
-      elif pointerMatrix[i,j] in [3, 5, 7, 9]:
-          #appends gap and accompanying nucleotide, then moves to the cell above
-          qtemp = '-'
-          subjectAlign.append(subjectSequence[i-1])
-          i -= 1
-      elif pointerMatrix[i,j] == 0:
-        queryAlign.append(querySequence[j-1])
-        subjectAlign.append(subjectSequence[i-1])
-        break
-    # Reverses the strings
-    subjectAlign = ''.join(subjectAlign)[::-1]
-    queryAlign= ''.join(queryAlign)[::-1]
-    '\n'.join([subjectAlign, queryAlign])
+    while score > 0:
+        score = scoreMatrix[i][j]
+        if score == 0:
+            break
+        queryAlign = querySequence[j-1] + queryAlign
+        subjectAlign = subjectSequence[i-1] + subjectAlign
+        i -= 1
+        j -= 1
 
     return f"{queryAlign}\n{subjectAlign}"
     
@@ -219,7 +197,7 @@ class smith_waterman(_LOCALBASE):
     self.mismatch_penalty = mismatch_penalty
     self.gap_penalty = gap_penalty
 
-  def __call__(self, subjectSequence: str|list[str], querySequence: str|list[str])->tuple[int,int]: 
+  def __call__(self, subjectSequence: str|list[str], querySequence: str|list[str])-> int: 
       if not numpy:
           raise ImportError('Please pip install numpy!')
       
@@ -231,10 +209,6 @@ class smith_waterman(_LOCALBASE):
       subjectSequence, querySequence = frontWhiteSpace(subjectSequence, querySequence) 
       #matrix initialisation
       self.alignment_score = numpy.zeros((len(subjectSequence),len(querySequence))) 
-      #pointer to trace optimal alignment
-      self.pointer = numpy.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
-      self.pointer[:,0] = 3
-      self.pointer[0,:] = 4
 
       for i, _ in enumerate(subjectSequence):
         for j, _ in enumerate(querySequence):
@@ -252,15 +226,8 @@ class smith_waterman(_LOCALBASE):
           tmax = max(0, match, lgap, ugap) 
   
           self.alignment_score[i][j] = tmax
-  
-          if match == tmax: #matrix for traceback based on results from scoring matrix
-            self.pointer[i+1,j+1] += 2
-          if ugap == tmax:
-            self.pointer[i+1,j+1] += 3
-          if lgap == tmax:
-            self.pointer[i+1,j+1] += 4
-  
-      return self.alignment_score, self.pointer
+    
+      return self.alignment_score
 
 class waterman_smith_beyer(_GLOBALBASE):
   def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 3, continue_gap_penalty:int = 1)->None:
@@ -324,7 +291,6 @@ class waterman_smith_beyer(_GLOBALBASE):
   
       return self.alignment_score, self.pointer
 
-
 def frontWhiteSpace(querySequence: list[str], subjectSequence: list[str])->tuple[list[str],list[str]]: 
     #adds leading white space so that matrix works
     subjectSequence = rjustlist(subjectSequence)
@@ -336,6 +302,7 @@ needlemanWunsch = needleman_wunsch()
 watermanSmithBeyer = waterman_smith_beyer()
 smithWaterman = smith_waterman()
 levenshteinDist = levenshtein()
+#hirschbergDist = hirschberg()
 
 if __name__ == "__main__":
     main()
