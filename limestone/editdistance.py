@@ -6,8 +6,9 @@ except ImportError:
     numpy = None  
 
 def main():
-    print(hirschbergDist.align("AGTACGCA","TATGC"))
     print(needlemanWunsch.align("AGTACGCA","TATGC"))
+    print(hirschbergDist.align("AGTACGCA","TATGC"))
+    print(smithWaterman.scoreMatrix("ACTG","ACTG"))
 
 def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
   return sequence + [fillvalue] * (n - len(sequence)) 
@@ -156,16 +157,14 @@ class needleman_wunsch(_GLOBALBASE):
       self.pointer = numpy.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
       self.pointer[:,0] = 3
       self.pointer[0,:] = 4
-      #first row and column of matrix consisting of gap scores
-      init1 = [n*self.gap_penalty for n in range(len(subjectSequence))]
-      init2 = [n*self.gap_penalty for n in range(len(querySequence))]
 
       for i, _ in enumerate(subjectSequence):
         for j, _ in enumerate(querySequence):
-          #keeps first row and column consistent throughout all calculations
-          self.alignment_score[:,0] = init1
-          self.alignment_score[:1,] = init2
-
+          if i == 0 or j == 0:
+              #keeps first row and column consistent throughout all calculations
+              self.alignment_score[:,0] = [n*self.gap_penalty for n in range(len(subjectSequence))]
+              self.alignment_score[0,:] = [n*self.gap_penalty for n in range(len(querySequence))]
+          
           if subjectSequence[i] == querySequence[j]: 
               match = self.alignment_score[i-1][j-1] - self.match_score
           else:
@@ -211,11 +210,13 @@ class smith_waterman(_LOCALBASE):
       #matrix initialisation
       self.alignment_score = numpy.zeros((len(subjectSequence),len(querySequence))) 
 
+      
       for i, _ in enumerate(subjectSequence):
         for j, _ in enumerate(querySequence):
-          #keeps first row and column consistent throughout all calculations
-          self.alignment_score[:,0] = 0
-          self.alignment_score[:1,] = 0
+          if j == 0 or i == 0:
+              #keeps first row and column consistent throughout all calculations
+              self.alignment_score[:,0] = 0
+              self.alignment_score[0,:] = 0
 
           if subjectSequence[i] == querySequence[j]: 
               match = self.alignment_score[i-1][j-1] + self.match_score
@@ -226,8 +227,7 @@ class smith_waterman(_LOCALBASE):
           ugap = self.alignment_score[i-1][j] - self.gap_penalty 
           tmax = max(0, match, lgap, ugap) 
   
-          self.alignment_score[i][j] = tmax
-    
+          self.alignment_score[i][j] = tmax 
       return self.alignment_score
 
 class waterman_smith_beyer(_GLOBALBASE):
@@ -256,16 +256,14 @@ class waterman_smith_beyer(_GLOBALBASE):
       self.pointer = numpy.zeros((len(subjectSequence)+1, len(querySequence)+1)) 
       self.pointer[:,0] = 3
       self.pointer[0,:] = 4
-      #first row and column of matrix consisting of gap scores
-      init1 = [n*self.continue_gap_penalty+self.new_gap_penalty for n in range(len(subjectSequence))]
-      init2 = [n*self.continue_gap_penalty+self.new_gap_penalty for n in range(len(querySequence))]
   
       for i, _ in enumerate(subjectSequence):
         for j, _ in enumerate(querySequence):
-          #keeps first row and column consistent throughout all calculations
-          self.alignment_score[:,0] = init1
-          self.alignment_score[:1,] = init2
-          self.alignment_score[0][0] = 0
+          if i == 0 or j == 0:
+              #keeps first row and column consistent throughout all calculations
+              self.alignment_score[:,0] = [n*self.continue_gap_penalty+self.new_gap_penalty for n in range(len(subjectSequence))]
+              self.alignment_score[0,:] = [n*self.continue_gap_penalty+self.new_gap_penalty for n in range(len(querySequence))] 
+              self.alignment_score[0][0] = 0
   
           if subjectSequence[i] == querySequence[j]: 
             matchScore = self.alignment_score[i-1][j-1] - self.match_score
@@ -308,19 +306,19 @@ class hirschberg(_GLOBALBASE):
         elif len(subjectSequence) == 0:
             return querySequence, '-' * len(querySequence)
         elif len(querySequence) == 1 or len(subjectSequence) == 1:
-            return self._nw_align(querySequence, subjectSequence)
+            return self._align(querySequence, subjectSequence)
         else:
             xlen = len(querySequence)
             xmid = xlen // 2
-            score_l = self._nw_score(querySequence[:xmid], subjectSequence)
-            score_r = self._nw_score(querySequence[xmid:][::-1], subjectSequence[::-1])[::-1]
+            score_l = self._score(querySequence[:xmid], subjectSequence)
+            score_r = self._score(querySequence[xmid:][::-1], subjectSequence[::-1])[::-1]
             ymid = numpy.argmax(score_l + score_r)
 
             A_left, B_left = self(querySequence[:xmid], subjectSequence[:ymid])
             A_right, B_right = self(querySequence[xmid:], subjectSequence[ymid:])
             return A_left + A_right, B_left + B_right
 
-    def _nw_score(self, querySequence, subjectSequence):
+    def _score(self, querySequence, subjectSequence):
         m, n = len(querySequence), len(subjectSequence)
         score = numpy.zeros((2, n + 1))
 
@@ -338,7 +336,7 @@ class hirschberg(_GLOBALBASE):
 
         return score[1]
 
-    def _nw_align(self, querySequence, subjectSequence):
+    def _align(self, querySequence, subjectSequence):
         m, n = len(querySequence), len(subjectSequence)
         score = numpy.zeros((m + 1, n + 1))
         pointer = numpy.zeros((m + 1, n + 1))
@@ -352,7 +350,11 @@ class hirschberg(_GLOBALBASE):
 
         for i in range(1, m + 1):
             for j in range(1, n + 1):
-                match = score[i - 1][j - 1] + (self.match_score if querySequence[i - 1] == subjectSequence[j - 1] else self.mismatch_penalty)
+                
+                if querySequence[i-1] == subjectSequence[j-1]: 
+                    match = score[i-1][j-1] + self.match_score
+                else:
+                    match = score[i-1][j-1] + self.mismatch_penalty
                 delete = score[i - 1][j] + self.gap_penalty
                 insert = score[i][j - 1] + self.gap_penalty
                 score[i][j] = max(match, delete, insert)
@@ -385,8 +387,8 @@ class hirschberg(_GLOBALBASE):
         return queryAlign, subjectAlign
 
     def align(self, querySequence: str | list[str], subjectSequence: str | list[str]) -> str:
-        aligned_query, aligned_subject = self(querySequence, subjectSequence)
-        return f"{aligned_query}\n{aligned_subject}"
+        queryAlign, subjectAlign = self(querySequence, subjectSequence)
+        return f"{queryAlign}\n{subjectAlign}"
 
 def frontWhiteSpace(querySequence: list[str], subjectSequence: list[str])->tuple[list[str],list[str]]: 
     #adds leading white space so that matrix works
