@@ -306,19 +306,19 @@ class hirschberg(_GLOBALBASE):
         elif len(subjectSequence) == 0:
             return querySequence, '-' * len(querySequence)
         elif len(querySequence) == 1 or len(subjectSequence) == 1:
-            return self._align(querySequence, subjectSequence)
+            return self.__align(querySequence, subjectSequence)
         else:
             xlen = len(querySequence)
             xmid = xlen // 2
-            score_l = self._score(querySequence[:xmid], subjectSequence)
-            score_r = self._score(querySequence[xmid:][::-1], subjectSequence[::-1])[::-1]
+            score_l = self.__score(querySequence[:xmid], subjectSequence)
+            score_r = self.__score(querySequence[xmid:][::-1], subjectSequence[::-1])[::-1]
             ymid = numpy.argmax(score_l + score_r)
 
             A_left, B_left = self(querySequence[:xmid], subjectSequence[:ymid])
             A_right, B_right = self(querySequence[xmid:], subjectSequence[ymid:])
             return A_left + A_right, B_left + B_right
 
-    def _score(self, querySequence, subjectSequence):
+    def __score(self, querySequence, subjectSequence):
         m, n = len(querySequence), len(subjectSequence)
         score = numpy.zeros((2, n + 1))
 
@@ -336,7 +336,7 @@ class hirschberg(_GLOBALBASE):
 
         return score[1]
 
-    def _align(self, querySequence, subjectSequence):
+    def __align(self, querySequence, subjectSequence):
         m, n = len(querySequence), len(subjectSequence)
         score = numpy.zeros((m + 1, n + 1))
         pointer = numpy.zeros((m + 1, n + 1))
