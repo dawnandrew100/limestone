@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from limestone import editdistance
 
-class TestNeedlemanWunsch(unittest.TestCase):
+class TestHirschberg(unittest.TestCase):
         
     def test_align(self):
         nwalignment = editdistance.needlemanWunsch.align("BA", "ABA")

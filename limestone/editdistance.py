@@ -7,6 +7,7 @@ except ImportError:
 
 def main():
     print(needlemanWunsch.align("AGTACGCA","TATGC"))
+    print(needlemanWunsch.scoreMatrix("AGTACGCA","TATGC"))
     print(hirschbergDist.align("AGTACGCA","TATGC"))
     print(smithWaterman.scoreMatrix("ACTG","ACTG"))
 
@@ -290,13 +291,16 @@ class waterman_smith_beyer(_GLOBALBASE):
   
       return self.alignment_score, self.pointer
 
-class hirschberg(_GLOBALBASE):
+class hirschberg():
     def __init__(self, match_score: int = 1, mismatch_penalty: int = -1, gap_penalty: int = -2):
         self.match_score = match_score
         self.mismatch_penalty = mismatch_penalty
         self.gap_penalty = gap_penalty
     
     def __call__(self, querySequence, subjectSequence):
+        if not numpy:
+            raise ImportError('Please pip install numpy!')
+        
         if isinstance(querySequence, str):
             querySequence = querySequence.upper()
             subjectSequence = subjectSequence.upper()
@@ -368,6 +372,7 @@ class hirschberg(_GLOBALBASE):
 
         queryAlign, subjectAlign = "", ""
         i, j = m, n
+        print(score)
 
         while i > 0 or j > 0:
             if pointer[i][j] == 3:
