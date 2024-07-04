@@ -1,11 +1,9 @@
 from __future__ import annotations
-from re import sub
-
-from numpy import float64
-from numpy._typing import NDArray
 try:
     # external dependency
     import numpy
+    from numpy import float64
+    from numpy._typing import NDArray
 except ImportError:
     numpy = None  
 
