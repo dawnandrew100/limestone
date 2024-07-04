@@ -59,13 +59,18 @@ print(needlemanWunsch.align("BA","ABA"))
 #-BA
 #ABA
 print(needlemanWunsch.matrix("AFTG","ACTG"))
-[[ 0.  2.  4.  6.  8. 10.]
- [ 2.  0.  2.  4.  6.  8.]
- [ 4.  2.  0.  2.  4.  6.]
- [ 6.  4.  2.  1.  3.  5.]
- [ 8.  4.  4.  3.  1.  3.]
- [ 2.  4.  5.  5.  3.  1.]]
-```
+[[0. 2. 4. 6. 8.]
+ [2. 0. 2. 4. 6.]
+ [4. 2. 1. 3. 5.]
+ [6. 4. 3. 1. 3.]
+ [8. 6. 5. 3. 1.]]
+ ```
+
+# Work In Progress
+
+My implementation of the Waterman-Smith-Beyer algorithm has trouble with longer inputs (groups all letters towards end instead of aligning with matches where appropriate).
+For some reason, setting the match score to some arbitrarily high number (ex. 12) corrects this problem.
+Currently working to fix this bug.
 
 # Caveats
 
