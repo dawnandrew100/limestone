@@ -45,26 +45,29 @@ class _GLOBALBASE():
       ss = [x for x in ss]
       i = len(qs)
       j = len(ss)
-      queryAlign= ""
-      subjectAlign = ""
+      queryAlign= []
+      subjectAlign = []
 
       while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
         if pointerMatrix[i,j] in [2, 5, 6, 9]:
             #appends match/mismatch then moves to the cell diagonally up and to the left
-            queryAlign = qs[i-1] + queryAlign
-            subjectAlign = ss[j-1] + subjectAlign
+            queryAlign.append(qs[i-1])
+            subjectAlign.append(ss[j-1])
             i -= 1
             j -= 1
         elif pointerMatrix[i,j] in [3, 5, 7, 9]:
           #appends gap and accompanying nucleotide, then moves to the cell above
-            subjectAlign = '-' + subjectAlign
-            queryAlign = qs[i-1] + queryAlign
+            subjectAlign.append('-')
+            queryAlign.append(qs[i-1])
             i -= 1
         elif pointerMatrix[i,j] in [4, 6, 7, 9]:
             #appends gap and accompanying nucleotide, then moves to the cell to the left
-            subjectAlign = ss[j-1] + subjectAlign
-            queryAlign = '-' +queryAlign
+            subjectAlign.append(ss[j-1])
+            queryAlign.append('-')
             j -= 1
+
+      queryAlign = "".join(queryAlign[::-1])
+      subjectAlign = "".join(subjectAlign[::-1])
 
       return f"{queryAlign}\n{subjectAlign}"
 
@@ -103,18 +106,21 @@ class _LOCALBASE():
     i, j = list(numpy.where(matrix == matrix.max()))
     i, j = i[-1], j[-1]
 
-    subjectAlign = ""
-    queryAlign= ""
+    subjectAlign = []
+    queryAlign= []
     score = matrix.max()
 
     while score > 0:
         score = matrix[i][j]
         if score == 0:
             break
-        queryAlign = qs[j-1] + queryAlign
-        subjectAlign = ss[i-1] + subjectAlign
+        queryAlign.append(qs[j-1])
+        subjectAlign.append(ss[i-1])
         i -= 1
         j -= 1
+
+    queryAlign = "".join(queryAlign[::-1])
+    subjectAlign = "".join(subjectAlign[::-1])
 
     return f"{queryAlign}\n{subjectAlign}"
 
