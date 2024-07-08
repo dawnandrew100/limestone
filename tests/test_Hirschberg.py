@@ -1,38 +1,38 @@
 from __future__ import annotations
 import unittest
-from limestone.editdistance import needlemanWunsch
-from limestone.editdistance import hirschbergDist
+from limestone.editdistance import needleman_wunsch
+from limestone.editdistance import hirschberg
 
 class TestHirschberg(unittest.TestCase):
         
     def test_align1(self):
-        nwalignment = needlemanWunsch.align("BA", "ABA")
-        hsalignment = hirschbergDist.align("BA","ABA")
+        nwalignment = needleman_wunsch.align("BA", "ABA")
+        hsalignment = hirschberg.align("BA","ABA")
         self.assertEqual(nwalignment, hsalignment)
     
     def test_align2(self):
-        nwalignment = needlemanWunsch.align("ATCG","ATCG")
-        hsalignment = hirschbergDist.align("ATCG","ATCG")
+        nwalignment = needleman_wunsch.align("ATCG","ATCG")
+        hsalignment = hirschberg.align("ATCG","ATCG")
         self.assertEqual(nwalignment, hsalignment)
 
     def test_align3(self):
-        nwalignment = needlemanWunsch.align("ACTG","FHYU")
-        hsalignment = hirschbergDist.align("ACTG","FHYU")
+        nwalignment = needleman_wunsch.align("ACTG","FHYU")
+        hsalignment = hirschberg.align("ACTG","FHYU")
         self.assertEqual(nwalignment, hsalignment)
 
     def test_align4(self):
-        nwalignment = needlemanWunsch.align("AGTACGCA","TATGC")
-        hsalignment = hirschbergDist.align("AGTACGCA","TATGC")
+        nwalignment = needleman_wunsch.align("AGTACGCA","TATGC")
+        hsalignment = hirschberg.align("AGTACGCA","TATGC")
         self.assertEqual(nwalignment, hsalignment)
 
     def test_align5(self):
-        nwalignment = needlemanWunsch.align("TACOBELL","TABELL")
-        hsalignment = hirschbergDist.align("TACOBELL","TABELL")
+        nwalignment = needleman_wunsch.align("TACOBELL","TABELL")
+        hsalignment = hirschberg.align("TACOBELL","TABELL")
         self.assertEqual(nwalignment, hsalignment)
 
     def test_align6(self):
-        nwalignment = needlemanWunsch.align("FASTFOAODKING","FASTAKING")
-        hsalignment = hirschbergDist.align("FASTFOAODKING","FASTAKING")
+        nwalignment = needleman_wunsch.align("FASTFOAODKING","FASTAKING")
+        hsalignment = hirschberg.align("FASTFOAODKING","FASTAKING")
         self.assertEqual(nwalignment, hsalignment)
 
 

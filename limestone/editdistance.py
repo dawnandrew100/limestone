@@ -1,4 +1,5 @@
 from __future__ import annotations
+from re import sub
 try:
     # external dependency
     import numpy
@@ -8,14 +9,10 @@ except ImportError:
     numpy = None  
 
 def main():
-    qqs = "AFTG"
-    sss = "ACTG"
+    qqs = "AT"
+    sss = "AAGT"
 
-    print(needlemanWunsch.matrix(qqs,sss))
-    print(needlemanWunsch.align(qqs,sss))
-    print(watermanSmithBeyer.matrix(qqs,sss))
-    print(watermanSmithBeyer.align(qqs,sss))
-    print(hirschbergDist.align(qqs,sss))
+    print(watermanSmithBeyer.matrix(qqs, sss))
 
 class _GLOBALBASE():
   def matrix(self, querySequence: str, subjectSequence: str)->list[list[float]]:
@@ -124,7 +121,7 @@ class _LOCALBASE():
 
     return f"{queryAlign}\n{subjectAlign}"
 
-class hamming(_GLOBALBASE):
+class Hamming(_GLOBALBASE):
     def align(self, querySequence: str, subjectSequence: str)->str:
         return f"{querySequence}\n{subjectSequence}"
 
@@ -134,13 +131,17 @@ class hamming(_GLOBALBASE):
     def __call__(self, querySequence: str, subjectSequence: str)->tuple[int,list[int]]:
       if not numpy:
           raise ImportError('Please pip install numpy!')
-
+      
       qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
-      qs = [x for x in qs]
-      ss = [x for x in ss]
 
-      long = max(ss,qs)
-      short = min(ss,qs)
+      if len(qs) == 1 and len(ss) == 1:
+          dist = 1 if qs != ss else 0
+          dist_array = [dist]
+          return dist, dist_array
+
+      shortlen = min(map(len, [ss,qs]))
+      short = qs if len(qs) == shortlen else ss
+      long = ss if len(qs) == shortlen else qs
 
       dist = 0
       dist_array = []
@@ -173,7 +174,7 @@ class hamming(_GLOBALBASE):
         simarray = [1 if num == 0 else 0 for num in distarray]
         return simarray
 
-class needleman_wunsch(_GLOBALBASE):
+class Needleman_Wunsch(_GLOBALBASE):
   def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
     self.match_score = match_score
     self.mismatch_penalty = mismatch_penalty
@@ -194,14 +195,14 @@ class needleman_wunsch(_GLOBALBASE):
       self.pointer = numpy.zeros((len(qs), len(ss))) 
       self.pointer[:,0] = 3
       self.pointer[0,:] = 4
-      #keeps first row and column consistent throughout all calculations
+      #initialisation of starter values for first column and first row
       self.alignment_score[:,0] = [n*self.gap_penalty for n in range(len(qs))]
       self.alignment_score[0,:] = [n*self.gap_penalty for n in range(len(ss))]
 
       for i, query_char in enumerate(qs):
         for j, subject_char in enumerate(ss):
           if i == 0 or j == 0:
-              #doesn't override initialization
+              #keeps first row and column consistent throughout all calculations
               continue
           if query_char == subject_char: 
               match = self.alignment_score[i-1][j-1] - self.match_score
@@ -223,13 +224,13 @@ class needleman_wunsch(_GLOBALBASE):
               
       return self.alignment_score, self.pointer
 
-class levenshtein(needleman_wunsch):
+class Levenshtein(Needleman_Wunsch):
   def __init__(self):
     self.match_score = 0
     self.mismatch_penalty = 1
     self.gap_penalty = 1
 
-class smith_waterman(_LOCALBASE):
+class Smith_Waterman(_LOCALBASE):
   def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
     self.match_score = match_score
     self.mismatch_penalty = mismatch_penalty
@@ -268,7 +269,7 @@ class smith_waterman(_LOCALBASE):
           self.alignment_score[i][j] = tmax 
       return self.alignment_score
 
-class waterman_smith_beyer(_GLOBALBASE):
+class Waterman_Smith_Beyer(_GLOBALBASE):
   def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 3, continue_gap_penalty:int = 1)->None:
       self.match_score = match_score
       self.mismatch_penalty = mismatch_penalty
@@ -290,6 +291,7 @@ class waterman_smith_beyer(_GLOBALBASE):
       self.pointer = numpy.zeros((len(qs), len(ss))) 
       self.pointer[:,0] = 3
       self.pointer[0,:] = 4
+      #initialisation of starter values for first column and first row
       self.alignment_score[:,0] = [self.new_gap_penalty + n * self.continue_gap_penalty for n in range(len(qs))]
       self.alignment_score[0,:] = [self.new_gap_penalty + n * self.continue_gap_penalty for n in range(len(ss))] 
       self.alignment_score[0][0] = 0
@@ -325,7 +327,7 @@ class waterman_smith_beyer(_GLOBALBASE):
 
       return self.alignment_score, self.pointer
 
-class hirschberg():
+class Hirschberg():
     def __init__(self, match_score: int = 1, mismatch_penalty: int = -1, gap_penalty: int = -2)->None:
         self.match_score = match_score
         self.mismatch_penalty = mismatch_penalty
@@ -387,7 +389,6 @@ class hirschberg():
 
         for i in range(1, m + 1):
             for j in range(1, n + 1):
-
                 if qs[i-1] == ss[j-1]: 
                     match = score[i-1][j-1] + self.match_score
                 else:
@@ -395,7 +396,6 @@ class hirschberg():
                 delete = score[i - 1][j] + self.gap_penalty
                 insert = score[i][j - 1] + self.gap_penalty
                 score[i][j] = max(match, delete, insert)
-
                 if score[i][j] == match:
                     pointer[i][j] = 3
                 elif score[i][j] == delete:
@@ -434,18 +434,18 @@ def frontWhiteSpace(qs: list[str], ss: list[str])->tuple[list[str],list[str]]:
     return qs, ss
 
 def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
-  return sequence + [fillvalue] * (n - len(sequence)) 
+    return sequence + [fillvalue] * (n - len(sequence)) 
 
 def rjustlist(sequence: list[str], fillvalue='')->list[str]:
-  return [fillvalue] + sequence
+    return [fillvalue] + sequence
 
 
-needlemanWunsch = needleman_wunsch()
-watermanSmithBeyer = waterman_smith_beyer()
-smithWaterman = smith_waterman()
-levenshteinDist = levenshtein()
-hirschbergDist = hirschberg()
-hammingDist = hamming()
+needleman_wunsch = Needleman_Wunsch()
+waterman_smith_beyer = Waterman_Smith_Beyer()
+smith_waterman = Smith_Waterman()
+levenshtein = Levenshtein()
+hirschberg = Hirschberg()
+hamming = Hamming()
 
 if __name__ == "__main__":
     main()
