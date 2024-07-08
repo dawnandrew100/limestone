@@ -12,7 +12,7 @@ def main():
     qqs = "AT"
     sss = "AAGT"
 
-    print(watermanSmithBeyer.matrix(qqs, sss))
+    print(waterman_smith_beyer.matrix(qqs, sss))
 
 class _GLOBALBASE():
   def matrix(self, querySequence: str, subjectSequence: str)->list[list[float]]:
