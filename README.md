@@ -68,12 +68,13 @@ print(needlemanWunsch.matrix("AFTG","ACTG"))
 
 # Work In Progress
 
-My implementation of the Waterman-Smith-Beyer algorithm has trouble with longer inputs (groups all letters towards end instead of aligning with matches where appropriate).
-For some reason, setting the match score to some arbitrarily high number (ex. 12) corrects this problem.
-Currently working to fix this bug.
+-- To be continued
 
 # Caveats
 
 Due to the recursive nature of the Hirschberg algorithm, if a distance score or matrix is needed it is best to use the Needleman-Wunsch algorithm instead.
 
 Note that due to the fact that the Hamming distance does not allow for substitutions, insertions, or deletions, the "aligned sequence" that is returned is just the original sequences in a formatted string.
+
+My Waterman-Smith-Beyer implementation does not align with that of [Freiburg University](http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Waterman-Smith-Beyer), the site I've been using for alignment validation.
+It is possible that their implementation has an issue and not mine but I wanted to mention this here and provide the link to my [StackOverflow](https://bioinformatics.stackexchange.com/questions/22683/waterman-smith-beyer-implementation-in-python) question for the sake of posterity.

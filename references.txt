@@ -1,0 +1,29 @@
+REFERENCE FOR SELF.POINTER AND GLOBAL ALIGNMENT CODE
+Title: needleman-wunsch.py
+Author: slowkow
+Date: 2023
+Code Version: 1.01
+Availability: https://gist.github.com/slowkow/06c6dba9180d013dfd82bec217d22eb5
+
+REFERENCE FOR SIMILARITY AND DISTANCE SCORE
+Title: textdistance.py
+Author: orsinium
+Date: 2023
+Code Version: 4.6.0
+Availability: https://github.com/life4/textdistance/tree/master/textdistance
+Pypi Link: https://pypi.org/project/textdistance/
+
+REFERENCE FOR SCORE CALCULATIONS
+Title: Dynamic Programming: Edit Distance
+Author: Clarke, T. et al.
+Access Date: 10 Dec 2023
+Availability: https://www.cis.upenn.edu/~cis110/12su/hw/hw06/dynprog.shtml
+
+REFERENCE FOR ALIGNMENT ACCURACY COMPARISON
+Title: Freiburg RNA tools: a central online resource 
+for RNA-focused research and teaching
+Author: Raden, M. et al.
+Publish Date: 21 May 2018
+Access Date: 11 Dec 2023
+Research Paper Link: https://academic.oup.com/nar/article/46/W1/W25/5000013
+Tool Availability: http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Waterman-Smith-Beyer
