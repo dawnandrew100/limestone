@@ -1,5 +1,5 @@
 # Limestone
-This project contains several sequence alignment algorithms that can also produce scoring matrices for Needleman-Wunsch, Smith-Waterman, and Waterman-Smith-Beyer algorithms. 
+This project contains several sequence alignment algorithms that can also produce scoring matrices for Needleman-Wunsch, Smith-Waterman, Wagner-Fischer, and Waterman-Smith-Beyer algorithms. 
 
 ***Please ensure that numpy is installed so that this project can work correctly***
 
@@ -12,9 +12,22 @@ This project contains several sequence alignment algorithms that can also produc
 |Needleman-Wunsch    |    [x]    |    [x]   |               [x]              |
 |Smith-Waterman      |    [x]    |    [x]   |               [x]              |
 |Waterman-Smith-Beyer|    [x]    |    [x]   |               [x]              |
-|Levenshtein         |    [x]    |    [x]   |               [x]              |
+|Wagner-Fischer      |    [x]    |    [x]   |               [x]              |
 |Hamming             |    [x]    |    [ ]   |               [x]              |
 |Hirschberg          |    [x]    |    [ ]   |               [ ]              |
+
+## Algorithms Explained
+[Needleman-Wunsch](https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm)
+
+[Smith-Waterman ](https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm)
+
+[Waterman-Smith-Beyer](http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Waterman-Smith-Beyer)
+
+[Wagner-Fischer](https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm)
+
+[Hamming](https://en.wikipedia.org/wiki/Hamming_distance)
+
+[Hirschberg](https://en.wikipedia.org/wiki/Hirschberg%27s_algorithm)
 
 # Code Examples
 
@@ -78,3 +91,6 @@ Note that due to the fact that the Hamming distance does not allow for substitut
 
 My Waterman-Smith-Beyer implementation does not align with that of [Freiburg University](http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Waterman-Smith-Beyer), the site I've been using for alignment validation.
 It is possible that their implementation has an issue and not mine but I wanted to mention this here and provide the link to my [StackOverflow](https://bioinformatics.stackexchange.com/questions/22683/waterman-smith-beyer-implementation-in-python) question for the sake of posterity.
+
+During the beginning of this project I thought that the Levenshtein distance was an algorithm, but it is the end result that is being calculated with an approach such as Wagner-Fischer which uses Needleman-Wunsch-esque matrices to calculate the Levenshtein distance.
+Thusly, the Levenshtein distance implementation has been switched with the Wagner-Fischer algorithm.

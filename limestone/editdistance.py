@@ -8,8 +8,8 @@ except ImportError:
     raise ImportError("Please pip install all dependencies from requirements.txt!")
 
 def main():
-    qqs = "WATERBLESSING"
-    sss = "HOLYWATERISABLESSING"
+    qqs = "HOLYWATERISABLESSING"
+    sss = "HOLYWATISSS"
 
     print(waterman_smith_beyer.align(qqs, sss))
 
@@ -170,6 +170,50 @@ class Hamming(_GLOBALBASE):
         simarray = [1 if num == 0 else 0 for num in distarray]
         return simarray
 
+class Wagner_Fischer(_GLOBALBASE):
+    def __init__(self)->None:
+        self.gap_penalty = 1
+
+    def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64],NDArray[float64]]:
+        qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
+        qs = [x for x in qs]
+        ss = [x for x in ss]
+        qs, ss = frontWhiteSpace(qs, ss)
+
+        #matrix initialisation
+        self.alignment_score = numpy.zeros((len(qs),len(ss)))
+        #pointer matrix to trace optimal alignment
+        self.pointer = numpy.zeros((len(qs), len(ss)))
+        self.pointer[:,0] = 3
+        self.pointer[0,:] = 4
+        #initialisation of starter values for first column and first row
+        self.alignment_score[:,0] = [n for n in range(len(qs))]
+        self.alignment_score[0,:] = [n for n in range(len(ss))]
+
+        for i, query_char in enumerate(qs):
+          for j, subject_char in enumerate(ss):
+              substitution_cost = 0
+              if i == 0 or j == 0:
+                  #keeps first row and column consistent throughout all calculations
+                  continue
+              if query_char != subject_char:
+                  substitution_cost = 1
+              match = self.alignment_score[i-1][j-1] + substitution_cost
+              ugap = self.alignment_score[i-1][j] + self.gap_penalty
+              lgap = self.alignment_score[i][j-1] + self.gap_penalty
+              tmin = min(match, lgap, ugap)
+
+              self.alignment_score[i][j] = tmin #lowest value is best choice
+
+              if match == tmin: #matrix for traceback based on results from scoring matrix
+                  self.pointer[i,j] += 2
+              if ugap == tmin:
+                  self.pointer[i,j] += 3
+              if lgap == tmin:
+                  self.pointer[i,j] += 4
+
+        return self.alignment_score, self.pointer
+
 class Needleman_Wunsch(_GLOBALBASE):
     def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
         self.match_score = match_score
@@ -180,12 +224,12 @@ class Needleman_Wunsch(_GLOBALBASE):
         qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
         qs = [x for x in qs]
         ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss) 
+        qs, ss = frontWhiteSpace(qs, ss)
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss)))
         #pointer matrix to trace optimal alignment
-        self.pointer = numpy.zeros((len(qs), len(ss))) 
+        self.pointer = numpy.zeros((len(qs), len(ss)))
         self.pointer[:,0] = 3
         self.pointer[0,:] = 4
         #initialisation of starter values for first column and first row
@@ -194,33 +238,27 @@ class Needleman_Wunsch(_GLOBALBASE):
 
         for i, query_char in enumerate(qs):
           for j, subject_char in enumerate(ss):
-            if i == 0 or j == 0:
-                #keeps first row and column consistent throughout all calculations
-                continue
-            if query_char == subject_char: 
-                match = self.alignment_score[i-1][j-1] - self.match_score
-            else:
-                match = self.alignment_score[i-1][j-1] + self.mismatch_penalty
-            ugap = self.alignment_score[i-1][j] + self.gap_penalty 
-            lgap = self.alignment_score[i][j-1] + self.gap_penalty 
-            tmin = min(match, lgap, ugap)
+              if i == 0 or j == 0:
+                  #keeps first row and column consistent throughout all calculations
+                  continue
+              if query_char == subject_char:
+                  match = self.alignment_score[i-1][j-1] - self.match_score
+              else:
+                  match = self.alignment_score[i-1][j-1] + self.mismatch_penalty
+              ugap = self.alignment_score[i-1][j] + self.gap_penalty
+              lgap = self.alignment_score[i][j-1] + self.gap_penalty
+              tmin = min(match, lgap, ugap)
 
-            self.alignment_score[i][j] = tmin #lowest value is best choice
+              self.alignment_score[i][j] = tmin #lowest value is best choice
 
-            if match == tmin: #matrix for traceback based on results from scoring matrix
-              self.pointer[i,j] += 2
-            if ugap == tmin:
-              self.pointer[i,j] += 3
-            if lgap == tmin:
-              self.pointer[i,j] += 4
+              if match == tmin: #matrix for traceback based on results from scoring matrix
+                  self.pointer[i,j] += 2
+              if ugap == tmin:
+                  self.pointer[i,j] += 3
+              if lgap == tmin:
+                  self.pointer[i,j] += 4
 
         return self.alignment_score, self.pointer
-
-class Levenshtein(Needleman_Wunsch):
-    def __init__(self):
-        self.match_score = 0
-        self.mismatch_penalty = 1
-        self.gap_penalty = 1
 
 class Smith_Waterman(_LOCALBASE):
     def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
@@ -423,12 +461,12 @@ def rjustlist(sequence: list[str], fillvalue='')->list[str]:
     return [fillvalue] + sequence
 
 
+hamming = Hamming()
+wagner_fischer = Wagner_Fischer()
 needleman_wunsch = Needleman_Wunsch()
 waterman_smith_beyer = Waterman_Smith_Beyer()
 smith_waterman = Smith_Waterman()
-levenshtein = Levenshtein()
 hirschberg = Hirschberg()
-hamming = Hamming()
 
 if __name__ == "__main__":
     main()
