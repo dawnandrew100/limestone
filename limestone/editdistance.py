@@ -8,10 +8,15 @@ except ImportError:
     raise ImportError("Please pip install all dependencies from requirements.txt!")
 
 def main():
-    qqs = "HOLYWATERISABLESSING"
-    sss = "HOLYWATISSS"
+    qqs = "ACTGGTAC"
+    sss = "ATCGGATC"
 
     print(waterman_smith_beyer.align(qqs, sss))
+    print(waterman_smith_beyer.distance(qqs, sss))
+    print(needleman_wunsch.align(qqs,sss))
+    print(needleman_wunsch.distance(qqs,sss))
+    print(lowrance_wagner.align(qqs, sss))
+    print(lowrance_wagner.distance(qqs,sss))
 
 class _GLOBALBASE():
     def matrix(self, querySequence: str, subjectSequence: str)->list[list[float]]:
@@ -170,7 +175,7 @@ class Hamming(_GLOBALBASE):
         simarray = [1 if num == 0 else 0 for num in distarray]
         return simarray
 
-class Wagner_Fischer(_GLOBALBASE):
+class Wagner_Fischer(_GLOBALBASE): #Levenshtein Distance
     def __init__(self)->None:
         self.gap_penalty = 1
 
@@ -213,6 +218,92 @@ class Wagner_Fischer(_GLOBALBASE):
                   self.pointer[i,j] += 4
 
         return self.alignment_score, self.pointer
+
+class Lowrance_Wagner(_GLOBALBASE): #Damerau-Levenshtein distance
+    def __init__(self)->None:
+        self.gap_penalty = 1
+
+    def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64],NDArray[float64]]:
+        qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
+        qs = [x for x in qs]
+        ss = [x for x in ss]
+        qs, ss = frontWhiteSpace(qs, ss)
+
+        #matrix initialisation
+        self.alignment_score = numpy.zeros((len(qs),len(ss)))
+        #pointer matrix to trace optimal alignment
+        self.pointer = numpy.zeros((len(qs), len(ss)))
+        self.pointer[:,0] = 3
+        self.pointer[0,:] = 4
+        #initialisation of starter values for first column and first row
+        self.alignment_score[:,0] = [n for n in range(len(qs))]
+        self.alignment_score[0,:] = [n for n in range(len(ss))]
+
+        for i, query_char in enumerate(qs):
+          for j, subject_char in enumerate(ss):
+              substitution_cost = 0
+              if i == 0 or j == 0:
+                  #keeps first row and column consistent throughout all calculations
+                  continue
+              if query_char != subject_char:
+                  substitution_cost = 1
+              match = self.alignment_score[i-1][j-1] + substitution_cost
+              ugap = self.alignment_score[i-1][j] + self.gap_penalty
+              lgap = self.alignment_score[i][j-1] + self.gap_penalty
+              trans = self.alignment_score[i-2][j-2] + 1 if qs[i] == ss[j-1] and ss[j] == qs[i-1] else float('inf')
+              tmin = min(match, lgap, ugap, trans)
+
+              self.alignment_score[i][j] = tmin #lowest value is best choice
+
+              if match == tmin: #matrix for traceback based on results from scoring matrix
+                  self.pointer[i,j] += 2
+              if ugap == tmin:
+                  self.pointer[i,j] += 3
+              if lgap == tmin:
+                  self.pointer[i,j] += 4
+              if trans == tmin:
+                  self.pointer[i,j] += 8
+
+        return self.alignment_score, self.pointer
+
+    def align(self, querySequence: str, subjectSequence: str)->str: 
+        qs,ss= map(lambda x: x.upper(), [querySequence, subjectSequence])
+        _, pointerMatrix = self(qs, ss)
+
+        qs = [x for x in qs]
+        ss = [x for x in ss]
+        i = len(qs)
+        j = len(ss)
+        queryAlign= []
+        subjectAlign = []
+
+        while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
+          if pointerMatrix[i,j] in [2, 5, 6, 10, 17]:
+              #appends match/mismatch then moves to the cell diagonally up and to the left
+              queryAlign.append(qs[i-1])
+              subjectAlign.append(ss[j-1])
+              i -= 1
+              j -= 1
+          elif pointerMatrix[i,j] in [8, 10, 11, 12, 17]:
+              queryAlign.extend([qs[i-1],qs[i-2]])
+              subjectAlign.extend([ss[j-2],ss[j-1]])
+              i -= 2
+              j-= 2
+          elif pointerMatrix[i,j] in [3, 5, 7, 11, 17]:
+              #appends gap and accompanying nucleotide, then moves to the cell above
+              subjectAlign.append('-')
+              queryAlign.append(qs[i-1])
+              i -= 1
+          elif pointerMatrix[i,j] in [4, 6, 7,12, 17]:
+              #appends gap and accompanying nucleotide, then moves to the cell to the left
+              subjectAlign.append(ss[j-1])
+              queryAlign.append('-')
+              j -= 1
+
+        queryAlign = "".join(queryAlign[::-1])
+        subjectAlign = "".join(subjectAlign[::-1])
+
+        return f"{queryAlign}\n{subjectAlign}"
 
 class Needleman_Wunsch(_GLOBALBASE):
     def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
@@ -467,6 +558,7 @@ needleman_wunsch = Needleman_Wunsch()
 waterman_smith_beyer = Waterman_Smith_Beyer()
 smith_waterman = Smith_Waterman()
 hirschberg = Hirschberg()
+lowrance_wagner = Lowrance_Wagner()
 
 if __name__ == "__main__":
     main()

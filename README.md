@@ -13,6 +13,7 @@ This project contains several sequence alignment algorithms that can also produc
 |Smith-Waterman      |    [x]    |    [x]   |               [x]              |
 |Waterman-Smith-Beyer|    [x]    |    [x]   |               [x]              |
 |Wagner-Fischer      |    [x]    |    [x]   |               [x]              |
+|Lowrance-Wagner     |    [x]    |    [x]   |               [x]              |
 |Hamming             |    [x]    |    [ ]   |               [x]              |
 |Hirschberg          |    [x]    |    [ ]   |               [ ]              |
 
@@ -23,7 +24,9 @@ This project contains several sequence alignment algorithms that can also produc
 
 [Waterman-Smith-Beyer](http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Waterman-Smith-Beyer)
 
-[Wagner-Fischer](https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm)
+[Wagner-Fischer](https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm) <- Levenshtein distance
+
+[Lowrance-Wagner](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2819-0) <- Damerau–Levenshtein distance (Levenshtein distance plus adjacent swapping)
 
 [Hamming](https://en.wikipedia.org/wiki/Hamming_distance)
 
