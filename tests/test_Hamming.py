@@ -78,14 +78,32 @@ class TestHamming(unittest.TestCase):
         self.assertEqual(dist, ans)
 
     def test_align1(self):
-        dist = hamming.align("ACTG", "ATGA")
+        align = hamming.align("ACTG", "ATGA")
         ans = f"ACTG\nATGA"
-        self.assertEqual(dist, ans)
+        self.assertEqual(align, ans)
 
     def test_align2(self):
-        dist = hamming.align("ACTGAA", "ATGA")
+        align = hamming.align("ACTGAA", "ATGA")
         ans = f"ACTGAA\nATGA"
-        self.assertEqual(dist, ans)
+        self.assertEqual(align, ans)
+
+    def test_align_num1(self):
+        align = hamming.align(12, 13)
+        ans ="00001100\n00001101"
+        self.assertEqual(align, ans)
+
+    def test_align_num2(self):
+        align = hamming.distance(12, 13)
+        self.assertEqual(align, 1)
+
+    def test_align_num1_string(self):
+        align = hamming.align("12", "13")
+        ans ="00001100\n00001101"
+        self.assertEqual(align, ans)
+
+    def test_align_num2_string(self):
+        align = hamming.distance("12", "13")
+        self.assertEqual(align, 1)
 
 if __name__ == '__main__':
     unittest.main()

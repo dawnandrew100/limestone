@@ -11,12 +11,14 @@ def main():
     qqs = "ACTGGTAC"
     sss = "ATCGGATC"
 
-    print(waterman_smith_beyer.align(qqs, sss))
-    print(waterman_smith_beyer.distance(qqs, sss))
     print(needleman_wunsch.align(qqs,sss))
-    print(needleman_wunsch.distance(qqs,sss))
-    print(lowrance_wagner.align(qqs, sss))
-    print(lowrance_wagner.distance(qqs,sss))
+    print(hamming.align(qqs,sss))
+    print(hamming.align(13,12))
+    print(hamming.align("13","12"))
+    print(hamming.distance(qqs, sss))
+    print(hamming.distance(13, 12))
+    print(hamming.distance("13","12"))
+
 
 class _GLOBALBASE():
     def matrix(self, querySequence: str, subjectSequence: str)->list[list[float]]:
@@ -126,13 +128,32 @@ class _LOCALBASE():
       return f"{queryAlign}\n{subjectAlign}"
 
 class Hamming(_GLOBALBASE):
-    def align(self, querySequence: str, subjectSequence: str)->str:
+    def __int_or_str(self, querySequence: str|int, subjectSequence: str|int) -> tuple[str,str]:
+        """
+        Hamming distance between integers is measured between the binary representaiton of the integers.
+        If a string of letters is passed into this hamming function, then it remains unchanged.
+        If a number string or number literal is passed into this function then it is converted to binary.
+        """
+        querySequence, subjectSequence = str(querySequence), str(subjectSequence)
+        if str(querySequence).isdigit() and str(subjectSequence).isdigit():
+            qs, ss = int(querySequence), int(subjectSequence)
+            big = f'{qs:08b}' if qs > ss else f'{ss:08b}'
+            small = f'{ss:0{len(list(big))}b}' if ss < qs else f'{qs:0{len(list(big))}b}'
+            querySequence = big if f'{qs:08b}' == big else small
+            subjectSequence = big if f'{ss:08b}' == big else small
+        elif not str(querySequence).isalpha() or not str(subjectSequence).isalpha():
+            raise ValueError("Both sequences must be either all letters or all numbers")
+        return querySequence, subjectSequence
+
+    def align(self, querySequence: str|int, subjectSequence: str|int)->str:
+        querySequence, subjectSequence = self.__int_or_str(querySequence, subjectSequence)
         return f"{querySequence}\n{subjectSequence}"
 
     def matrix(self, qs: str, ss: str) -> None:
         return None
 
-    def __call__(self, querySequence: str, subjectSequence: str)->tuple[int,list[int]]:
+    def __call__(self, querySequence: str|int, subjectSequence: str|int)->tuple[int,list[int]]:
+        querySequence, subjectSequence = self.__int_or_str(querySequence, subjectSequence)
         qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
 
         if len(qs) == 1 and len(ss) == 1:
@@ -159,7 +180,8 @@ class Hamming(_GLOBALBASE):
 
         return dist, dist_array
 
-    def distance(self, querySequence: str, subjectSequence: str)->int:
+    def distance(self, querySequence: str|int, subjectSequence: str|int)->int:
+        querySequence, subjectSequence = self.__int_or_str(querySequence, subjectSequence)
         query = set([(x, y) for (x, y) in enumerate(querySequence)]) 
         subject = set([(x, y) for (x, y) in enumerate(subjectSequence)]) 
         qs,sq = query-subject, subject-query
