@@ -128,33 +128,28 @@ class _LOCALBASE():
       return f"{queryAlign}\n{subjectAlign}"
 
 class Hamming(_GLOBALBASE):
-    def __int_or_str(self, querySequence: str|int, subjectSequence: str|int) -> tuple[str,str]:
-        """
-        Hamming distance between integers is measured between the binary representaiton of the integers.
-        If a string of letters is passed into this hamming function, then it remains unchanged.
-        If a number string or number literal is passed into this function then it is converted to binary.
-        """
-        querySequence, subjectSequence = str(querySequence), str(subjectSequence)
-        if str(querySequence).isdigit() and str(subjectSequence).isdigit():
-            qs, ss = int(querySequence), int(subjectSequence)
-            big = f'{qs:08b}' if qs > ss else f'{ss:08b}'
-            small = f'{ss:0{len(list(big))}b}' if ss < qs else f'{qs:0{len(list(big))}b}'
-            querySequence = big if f'{qs:08b}' == big else small
-            subjectSequence = big if f'{ss:08b}' == big else small
-        elif not str(querySequence).isalpha() or not str(subjectSequence).isalpha():
-            raise ValueError("Both sequences must be either all letters or all numbers")
-        return querySequence, subjectSequence
-
+    def __int_pair(self, querySequence: str|int, subjectSequence: str|int) -> bool:
+      querySequence, subjectSequence = str(querySequence), str(subjectSequence)
+      if querySequence.isalpha() and subjectSequence.isalpha():
+          return False
+      if querySequence.isdigit() and subjectSequence.isdigit():
+          return True 
+      raise ValueError("Both sequences must be either all letters or all numbers")
+        
     def align(self, querySequence: str|int, subjectSequence: str|int)->str:
-        querySequence, subjectSequence = self.__int_or_str(querySequence, subjectSequence)
+        if self.__int_pair(querySequence, subjectSequence):
+            qs, ss = int(querySequence), int(subjectSequence)
+            return f"{bin(qs)}\n{bin(ss)}"
         return f"{querySequence}\n{subjectSequence}"
 
     def matrix(self, qs: str, ss: str) -> None:
         return None
 
     def __call__(self, querySequence: str|int, subjectSequence: str|int)->tuple[int,list[int]]:
-        querySequence, subjectSequence = self.__int_or_str(querySequence, subjectSequence)
-        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
+        if self.__int_pair(querySequence, subjectSequence):
+            qs, ss = bin(querySequence), bin(subjectSequence)
+        else:
+            qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
 
         if len(qs) == 1 and len(ss) == 1:
             dist = 1 if qs != ss else 0
@@ -181,12 +176,14 @@ class Hamming(_GLOBALBASE):
         return dist, dist_array
 
     def distance(self, querySequence: str|int, subjectSequence: str|int)->int:
-        querySequence, subjectSequence = self.__int_or_str(querySequence, subjectSequence)
+        if self.__int_pair(querySequence, subjectSequence):
+            qs, ss = int(querySequence), int(subjectSequence)
+            return bin(qs ^ ss).count("1")
         query = set([(x, y) for (x, y) in enumerate(querySequence)]) 
         subject = set([(x, y) for (x, y) in enumerate(subjectSequence)]) 
         qs,sq = query-subject, subject-query
         dist = max(map(len,[qs,sq]))
-        return dist
+        return dist 
 
     def binary_distance_array(self, querySequence: str, subjectSequence: str)->list[int]:
         _, distarray = self(querySequence, subjectSequence)

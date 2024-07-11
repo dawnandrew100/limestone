@@ -48,16 +48,16 @@ class TestHamming(unittest.TestCase):
         self.assertEqual(dist, 0.75)
  
     def test_norm_similarity1(self):
-        dist = hamming.normalized_similarity("ACTG", "AATG")
-        self.assertEqual(dist, 0.75)
+        sim = hamming.normalized_similarity("ACTG", "AATG")
+        self.assertEqual(sim, 0.75)
 
     def test_norm_similarity2(self):
-        dist = hamming.normalized_similarity("ACTG", "AAAG")
-        self.assertEqual(dist, 0.5)
+        sim = hamming.normalized_similarity("ACTG", "AAAG")
+        self.assertEqual(sim, 0.5)
 
     def test_norm_similarity3(self):
-        dist = hamming.normalized_similarity("ACTG", "AAAA")
-        self.assertEqual(dist, 0.25)
+        sim = hamming.normalized_similarity("ACTG", "AAAA")
+        self.assertEqual(sim, 0.25)
 
     def test_diff_len(self):
         dist = hamming.distance("ACTG", "AATGA")
@@ -68,14 +68,14 @@ class TestHamming(unittest.TestCase):
         self.assertEqual(dist, 2.0)
 
     def test_binary_diff(self):
-        dist = hamming.binary_distance_array("ACTG", "AATG")
+        distarray = hamming.binary_distance_array("ACTG", "AATG")
         ans = [1,0,1,1]
-        self.assertEqual(dist, ans)
+        self.assertEqual(distarray, ans)
 
     def test_binary_sim(self):
-        dist = hamming.binary_similarity_array("ACTG", "AATG")
+        simarray = hamming.binary_similarity_array("ACTG", "AATG")
         ans = [0,1,0,0]
-        self.assertEqual(dist, ans)
+        self.assertEqual(simarray, ans)
 
     def test_align1(self):
         align = hamming.align("ACTG", "ATGA")
@@ -89,21 +89,21 @@ class TestHamming(unittest.TestCase):
 
     def test_align_num1(self):
         align = hamming.align(12, 13)
-        ans ="00001100\n00001101"
+        ans ="0b1100\n0b1101"
         self.assertEqual(align, ans)
 
     def test_align_num2(self):
-        align = hamming.distance(12, 13)
-        self.assertEqual(align, 1)
+        numdist = hamming.distance(12, 13)
+        self.assertEqual(numdist, 1)
 
     def test_align_num1_string(self):
         align = hamming.align("12", "13")
-        ans ="00001100\n00001101"
+        ans ="0b1100\n0b1101"
         self.assertEqual(align, ans)
 
     def test_align_num2_string(self):
-        align = hamming.distance("12", "13")
-        self.assertEqual(align, 1)
+        numdist = hamming.distance("12", "13")
+        self.assertEqual(numdist, 1)
 
 if __name__ == '__main__':
     unittest.main()
