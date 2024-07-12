@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .base import GLOBALBASE as __GLOBALBASE, LOCALBASE as __LOCALBASE
 try:
     # external dependencies
     import numpy
@@ -8,126 +9,13 @@ except ImportError:
     raise ImportError("Please pip install all dependencies from requirements.txt!")
 
 def main():
-    qqs = "ACTGGTAC"
-    sss = "ATCGGATC"
+    qqs = "HOLYWATERISABLESSING"
+    sss = "HOLWISBLESSING"
 
     print(needleman_wunsch.align(qqs,sss))
-    print(hamming.align(qqs,sss))
-    print(hamming.align(13,12))
-    print(hamming.align("13","12"))
-    print(hamming.distance(qqs, sss))
-    print(hamming.distance(13, 12))
-    print(hamming.distance("13","12"))
+    print(waterman_smith_beyer.align(qqs, sss))
 
-
-class _GLOBALBASE():
-    def matrix(self, querySequence: str, subjectSequence: str)->list[list[float]]:
-      matrix, _ = self(querySequence, subjectSequence)
-      return matrix
-
-    def distance(self, querySequence: str, subjectSequence: str)->float:
-      matrix, _ = self(querySequence, subjectSequence)
-      return matrix[matrix.shape[0]-1,matrix.shape[1]-1]
-
-    def similarity(self, querySequence: str, subjectSequence: str)->float:
-      return max(len(querySequence),len(subjectSequence)) - self.distance(querySequence, subjectSequence)
-
-    def normalized_distance(self, querySequence: str, subjectSequence: str)->float:
-      dist = self.distance(querySequence, subjectSequence)
-      return dist/max(map(len, [querySequence, subjectSequence]))
-
-    def normalized_similarity(self, querySequence: str, subjectSequence: str)->float:
-      sim = self.similarity(querySequence, subjectSequence)
-      return sim/max(map(len, [querySequence, subjectSequence]))
-
-    def align(self, querySequence: str, subjectSequence: str)->str: 
-        qs,ss= map(lambda x: x.upper(), [querySequence, subjectSequence])
-        _, pointerMatrix = self(qs, ss)
-
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        i = len(qs)
-        j = len(ss)
-        queryAlign= []
-        subjectAlign = []
-
-        while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
-          if pointerMatrix[i,j] in [2, 5, 6, 9]:
-              #appends match/mismatch then moves to the cell diagonally up and to the left
-              queryAlign.append(qs[i-1])
-              subjectAlign.append(ss[j-1])
-              i -= 1
-              j -= 1
-          elif pointerMatrix[i,j] in [3, 5, 7, 9]:
-              #appends gap and accompanying nucleotide, then moves to the cell above
-              subjectAlign.append('-')
-              queryAlign.append(qs[i-1])
-              i -= 1
-          elif pointerMatrix[i,j] in [4, 6, 7, 9]:
-              #appends gap and accompanying nucleotide, then moves to the cell to the left
-              subjectAlign.append(ss[j-1])
-              queryAlign.append('-')
-              j -= 1
-
-        queryAlign = "".join(queryAlign[::-1])
-        subjectAlign = "".join(subjectAlign[::-1])
-
-        return f"{queryAlign}\n{subjectAlign}"
-
-class _LOCALBASE():
-    #All local base functions currently only used by Smith Waterman
-    def matrix(self, querySequence: str, subjectSequence: str)->list[list[float]]:
-      matrix = self(querySequence, subjectSequence)
-      return matrix
-
-    def similarity(self, querySequence: str,subjectSequence: str)->float:
-      matrix  = self(querySequence, subjectSequence)
-      return matrix.max()
-
-    def distance(self, querySequence: str, subjectSequence: str)->float:
-      return max(map(len, [querySequence, subjectSequence])) - self.similarity(querySequence, subjectSequence)
-
-    def normalized_distance(self, querySequence: str, subjectSequence: str)->float:
-      dist = self.distance(querySequence, subjectSequence)
-      return dist/max(map(len, [querySequence, subjectSequence]))
-
-    def normalized_similarity(self, querySequence: str, subjectSequence: str)->float:
-      similarity = self.similarity(querySequence, subjectSequence)
-      return similarity/max(map(len, [querySequence, subjectSequence]))
-
-    def align(self, querySequence: str, subjectSequence: str)->str:
-      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-      matrix = self(qs, ss)
-
-      qs = [x for x in qs]
-      ss = [x for x in ss]
-
-      if matrix.max() == 0:
-        return "There is no local alignment!"
-
-      #finds the largest value closest to bottom right of matrix
-      i, j = list(numpy.where(matrix == matrix.max()))
-      i, j = i[-1], j[-1]
-
-      subjectAlign = []
-      queryAlign= []
-      score = matrix.max()
-
-      while score > 0:
-          score = matrix[i][j]
-          if score == 0:
-              break
-          queryAlign.append(qs[j-1])
-          subjectAlign.append(ss[i-1])
-          i -= 1
-          j -= 1
-
-      queryAlign = "".join(queryAlign[::-1])
-      subjectAlign = "".join(subjectAlign[::-1])
-
-      return f"{queryAlign}\n{subjectAlign}"
-
-class Hamming(_GLOBALBASE):
+class Hamming(__GLOBALBASE):
     def __int_pair(self, querySequence: str|int, subjectSequence: str|int) -> bool:
       querySequence, subjectSequence = str(querySequence), str(subjectSequence)
       if querySequence.isalpha() and subjectSequence.isalpha():
@@ -194,7 +82,7 @@ class Hamming(_GLOBALBASE):
         simarray = [1 if num == 0 else 0 for num in distarray]
         return simarray
 
-class Wagner_Fischer(_GLOBALBASE): #Levenshtein Distance
+class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
     def __init__(self)->None:
         self.gap_penalty = 1
 
@@ -238,7 +126,7 @@ class Wagner_Fischer(_GLOBALBASE): #Levenshtein Distance
 
         return self.alignment_score, self.pointer
 
-class Lowrance_Wagner(_GLOBALBASE): #Damerau-Levenshtein distance
+class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
     def __init__(self)->None:
         self.gap_penalty = 1
 
@@ -324,7 +212,7 @@ class Lowrance_Wagner(_GLOBALBASE): #Damerau-Levenshtein distance
 
         return f"{queryAlign}\n{subjectAlign}"
 
-class Needleman_Wunsch(_GLOBALBASE):
+class Needleman_Wunsch(__GLOBALBASE):
     def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
         self.match_score = match_score
         self.mismatch_penalty = mismatch_penalty
@@ -370,7 +258,7 @@ class Needleman_Wunsch(_GLOBALBASE):
 
         return self.alignment_score, self.pointer
 
-class Smith_Waterman(_LOCALBASE):
+class Smith_Waterman(__LOCALBASE):
     def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
         self.match_score = match_score
         self.mismatch_penalty = mismatch_penalty
@@ -406,8 +294,8 @@ class Smith_Waterman(_LOCALBASE):
 
         return self.alignment_score
 
-class Waterman_Smith_Beyer(_GLOBALBASE):
-    def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 3, continue_gap_penalty:int = 1)->None:
+class Waterman_Smith_Beyer(__GLOBALBASE):
+    def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 1, continue_gap_penalty:int = 1)->None:
         self.match_score = match_score
         self.mismatch_penalty = mismatch_penalty
         self.new_gap_penalty = new_gap_penalty

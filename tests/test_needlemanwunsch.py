@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone.editdistance import needleman_wunsch
+from limestone import needleman_wunsch
 
 class TestNeedlemanWunsch(unittest.TestCase):
     def test_distance_diff(self):

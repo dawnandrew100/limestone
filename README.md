@@ -92,8 +92,9 @@ Due to the recursive nature of the Hirschberg algorithm, if a distance score or 
 
 Note that due to the fact that the Hamming distance does not allow for substitutions, insertions, or deletions, the "aligned sequence" that is returned is just the original sequences in a formatted string.
 
-My Waterman-Smith-Beyer implementation does not align with that of [Freiburg University](http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Waterman-Smith-Beyer), the site I've been using for alignment validation.
+My Waterman-Smith-Beyer implementation does not always align with that of [Freiburg University](http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Waterman-Smith-Beyer), the site I've been using for alignment validation.
 It is possible that their implementation has an issue and not mine but I wanted to mention this here and provide the link to my [StackOverflow](https://bioinformatics.stackexchange.com/questions/22683/waterman-smith-beyer-implementation-in-python) question for the sake of posterity.
 
 During the beginning of this project I thought that the Levenshtein distance was an algorithm, but it is the end result that is being calculated with an approach such as Wagner-Fischer which uses Needleman-Wunsch-esque matrices to calculate the Levenshtein distance.
 Thusly, the Levenshtein distance implementation has been switched with the Wagner-Fischer algorithm.
+Damerau-Levenshtein distance is found using the Lowrance-Wagner algorithm.

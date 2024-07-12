@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 import unittest
-from limestone.editdistance import lowrance_wagner 
+from limestone import lowrance_wagner 
 
 class TestLevenshtein(unittest.TestCase):
     def test_distance_diff(self):

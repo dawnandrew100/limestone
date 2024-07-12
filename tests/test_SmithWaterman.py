@@ -1,8 +1,8 @@
 from __future__ import annotations
 import unittest
-from limestone.editdistance import smith_waterman
+from limestone import smith_waterman
 
-class TestWatermanSmithBayer(unittest.TestCase):
+class TestSmithWaterman(unittest.TestCase):
     def test_distance_diff(self):
         dist = smith_waterman.distance("ACTG", "FHYU")
         self.assertEqual(dist, 4.0)

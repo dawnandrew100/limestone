@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone.editdistance import wagner_fischer 
+from limestone import wagner_fischer 
 
 class TestLevenshtein(unittest.TestCase):
     def test_distance_diff(self):
