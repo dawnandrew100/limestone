@@ -7,3 +7,4 @@ from limestone.algorithms.editdistance import needleman_wunsch
 from limestone.algorithms.editdistance import smith_waterman
 from limestone.algorithms.editdistance import wagner_fischer
 from limestone.algorithms.editdistance import waterman_smith_beyer
+from limestone.algorithms.editdistance import longest_common_subsequence
