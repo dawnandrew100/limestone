@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .base import GLOBALBASE as __GLOBALBASE, LOCALBASE as __LOCALBASE
+from limestone.algorithms.base import GLOBALBASE as __GLOBALBASE, LOCALBASE as __LOCALBASE
 try:
     # external dependencies
     import numpy
@@ -12,75 +12,12 @@ def main():
     qqs = "HOLYWATERISABLESSING"
     sss = "HOLWISBLESSING"
 
-    print(needleman_wunsch.align(qqs,sss))
-    print(waterman_smith_beyer.align(qqs, sss))
-
-class Hamming(__GLOBALBASE):
-    def __int_pair(self, querySequence: str|int, subjectSequence: str|int) -> bool:
-      querySequence, subjectSequence = str(querySequence), str(subjectSequence)
-      if querySequence.isalpha() and subjectSequence.isalpha():
-          return False
-      if querySequence.isdigit() and subjectSequence.isdigit():
-          return True 
-      raise ValueError("Both sequences must be either all letters or all numbers")
-        
-    def align(self, querySequence: str|int, subjectSequence: str|int)->str:
-        if self.__int_pair(querySequence, subjectSequence):
-            qs, ss = int(querySequence), int(subjectSequence)
-            return f"{bin(qs)}\n{bin(ss)}"
-        return f"{querySequence}\n{subjectSequence}"
-
-    def matrix(self, qs: str, ss: str) -> None:
-        return None
-
-    def __call__(self, querySequence: str|int, subjectSequence: str|int)->tuple[int,list[int]]:
-        if self.__int_pair(querySequence, subjectSequence):
-            qs, ss = bin(querySequence), bin(subjectSequence)
-        else:
-            qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
-
-        if len(qs) == 1 and len(ss) == 1:
-            dist = 1 if qs != ss else 0
-            dist_array = [dist]
-            return dist, dist_array
-
-        shortlen = min(map(len, [ss,qs]))
-        short = qs if len(qs) == shortlen else ss
-        long = ss if len(qs) == shortlen else qs
-
-        dist = 0
-        dist_array = []
-
-        for i, char in enumerate(short):
-            if char != long[i]:
-                dist += 1
-                dist_array.append(0)
-                continue
-            dist_array.append(1)
-
-        dist += len(long)-len(short)
-        dist_array.extend([1]*(len(long)-len(short)))
-
-        return dist, dist_array
-
-    def distance(self, querySequence: str|int, subjectSequence: str|int)->int:
-        if self.__int_pair(querySequence, subjectSequence):
-            qs, ss = int(querySequence), int(subjectSequence)
-            return bin(qs ^ ss).count("1")
-        query = set([(x, y) for (x, y) in enumerate(querySequence)]) 
-        subject = set([(x, y) for (x, y) in enumerate(subjectSequence)]) 
-        qs,sq = query-subject, subject-query
-        dist = max(map(len,[qs,sq]))
-        return dist 
-
-    def binary_distance_array(self, querySequence: str, subjectSequence: str)->list[int]:
-        _, distarray = self(querySequence, subjectSequence)
-        return distarray
-
-    def binary_similarity_array(self, querySequence: str, subjectSequence: str)->list[int]:
-        _, distarray = self(querySequence, subjectSequence)
-        simarray = [1 if num == 0 else 0 for num in distarray]
-        return simarray
+    print(smith_waterman.align(qqs,sss))
+    print(smith_waterman.distance(qqs, sss))
+    print(smith_waterman.similarity(qqs, sss))
+    print(longest_common_subsequence.align(qqs, sss))
+    print(longest_common_subsequence.distance(qqs, sss))
+    print(longest_common_subsequence.similarity(qqs, sss))
 
 class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
     def __init__(self)->None:
@@ -212,6 +149,73 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
 
         return f"{queryAlign}\n{subjectAlign}"
 
+class Hamming(__GLOBALBASE):
+    def __int_pair(self, querySequence: str|int, subjectSequence: str|int) -> bool:
+      querySequence, subjectSequence = str(querySequence), str(subjectSequence)
+      if querySequence.isalpha() and subjectSequence.isalpha():
+          return False
+      if querySequence.isdigit() and subjectSequence.isdigit():
+          return True 
+      raise ValueError("Both sequences must be either all letters or all numbers")
+        
+    def align(self, querySequence: str|int, subjectSequence: str|int)->str:
+        if self.__int_pair(querySequence, subjectSequence):
+            qs, ss = int(querySequence), int(subjectSequence)
+            return f"{bin(qs)}\n{bin(ss)}"
+        return f"{querySequence}\n{subjectSequence}"
+
+    def matrix(self, qs: str, ss: str) -> None:
+        return None
+
+    def __call__(self, querySequence: str|int, subjectSequence: str|int)->tuple[int,list[int]]:
+        if self.__int_pair(querySequence, subjectSequence):
+            qs, ss = bin(querySequence), bin(subjectSequence)
+        else:
+            qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
+
+        if len(qs) == 1 and len(ss) == 1:
+            dist = 1 if qs != ss else 0
+            dist_array = [dist]
+            return dist, dist_array
+
+        shortlen = min(map(len, [ss,qs]))
+        short = qs if len(qs) == shortlen else ss
+        long = ss if len(qs) == shortlen else qs
+
+        dist = 0
+        dist_array = []
+
+        for i, char in enumerate(short):
+            if char != long[i]:
+                dist += 1
+                dist_array.append(0)
+                continue
+            dist_array.append(1)
+
+        dist += len(long)-len(short)
+        dist_array.extend([1]*(len(long)-len(short)))
+
+        return dist, dist_array
+
+    def distance(self, querySequence: str|int, subjectSequence: str|int)->int:
+        if self.__int_pair(querySequence, subjectSequence):
+            qs, ss = int(querySequence), int(subjectSequence)
+            return bin(qs ^ ss).count("1")
+        query = set([(x, y) for (x, y) in enumerate(querySequence)]) 
+        subject = set([(x, y) for (x, y) in enumerate(subjectSequence)]) 
+        qs,sq = query-subject, subject-query
+        dist = max(map(len,[qs,sq]))
+        return dist 
+
+    def binary_distance_array(self, querySequence: str, subjectSequence: str)->list[int]:
+        _, distarray = self(querySequence, subjectSequence)
+        return distarray
+
+    def binary_similarity_array(self, querySequence: str, subjectSequence: str)->list[int]:
+        _, distarray = self(querySequence, subjectSequence)
+        simarray = [1 if num == 0 else 0 for num in distarray]
+        return simarray
+
 class Needleman_Wunsch(__GLOBALBASE):
     def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
         self.match_score = match_score
@@ -257,42 +261,6 @@ class Needleman_Wunsch(__GLOBALBASE):
                   self.pointer[i,j] += 4
 
         return self.alignment_score, self.pointer
-
-class Smith_Waterman(__LOCALBASE):
-    def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
-        self.match_score = match_score
-        self.mismatch_penalty = mismatch_penalty
-        self.gap_penalty = gap_penalty
-
-    def __call__(self, subjectSequence: str, querySequence: str)-> NDArray[float64]: 
-        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss) 
-
-        #matrix initialisation
-        self.alignment_score = numpy.zeros((len(qs),len(ss))) 
-
-        self.alignment_score[:,0] = 0
-        self.alignment_score[0,:] = 0
-
-        for i, query_char in enumerate(qs):
-          for j, subject_char in enumerate(ss):
-            if j == 0 or i == 0:
-                #keeps first row and column consistent throughout all calculations
-                continue
-
-            if query_char == subject_char: 
-                match = self.alignment_score[i-1][j-1] + self.match_score
-            else:
-                match = self.alignment_score[i-1][j-1] - self.mismatch_penalty
- 
-            ugap = self.alignment_score[i-1][j] - self.gap_penalty 
-            lgap = self.alignment_score[i][j-1] - self.gap_penalty 
-            tmax = max(0, match, lgap, ugap) 
-            self.alignment_score[i][j] = tmax
-
-        return self.alignment_score
 
 class Waterman_Smith_Beyer(__GLOBALBASE):
     def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 1, continue_gap_penalty:int = 1)->None:
@@ -446,6 +414,135 @@ class Hirschberg():
         queryAlign, subjectAlign = self(qs, ss)
         return f"{queryAlign}\n{subjectAlign}"
 
+class Smith_Waterman(__LOCALBASE):
+    def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
+        self.match_score = match_score
+        self.mismatch_penalty = mismatch_penalty
+        self.gap_penalty = gap_penalty
+
+    def __call__(self, querySequence: str, subjectSequence: str)-> NDArray[float64]: 
+        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
+        qs = [x for x in qs]
+        ss = [x for x in ss]
+        qs, ss = frontWhiteSpace(qs, ss) 
+
+        #matrix initialisation
+        self.alignment_score = numpy.zeros((len(qs),len(ss))) 
+
+        for i, query_char in enumerate(qs):
+          for j, subject_char in enumerate(ss):
+            if j == 0 or i == 0:
+                #keeps first row and column consistent throughout all calculations
+                continue
+
+            if query_char == subject_char: 
+                match = self.alignment_score[i-1][j-1] + self.match_score
+            else:
+                match = self.alignment_score[i-1][j-1] - self.mismatch_penalty
+ 
+            ugap = self.alignment_score[i-1][j] - self.gap_penalty 
+            lgap = self.alignment_score[i][j-1] - self.gap_penalty 
+            tmax = max(0, match, lgap, ugap) 
+            self.alignment_score[i][j] = tmax
+
+        return self.alignment_score
+ 
+    def align(self, querySequence: str, subjectSequence: str)->str:
+      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
+      matrix = self(qs, ss)
+
+      qs = [x for x in qs]
+      ss = [x for x in ss]
+
+      if matrix.max() == 0:
+        return "There is no local alignment!"
+
+      #finds the largest value closest to bottom right of matrix
+      i, j = list(numpy.where(matrix == matrix.max()))
+      i, j = i[-1], j[-1]
+
+      subjectAlign = []
+      queryAlign= []
+      score = matrix.max()
+
+      while score > 0:
+          score = matrix[i][j]
+          if score == 0:
+              break
+          queryAlign.append(qs[i-1])
+          subjectAlign.append(ss[j-1])
+          i -= 1
+          j -= 1
+
+      queryAlign = "".join(queryAlign[::-1])
+      subjectAlign = "".join(subjectAlign[::-1])
+
+      return f"{queryAlign}\n{subjectAlign}"
+
+class Longest_Common_Subsequence(__LOCALBASE):
+    def __init__(self):
+        self.match_score = 1
+
+    def __call__(self, querySequence: str, subjectSequence: str)-> NDArray[float64]: 
+        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
+        qs = [x for x in qs]
+        ss = [x for x in ss]
+        qs, ss = frontWhiteSpace(qs, ss) 
+
+        #matrix initialisation
+        self.alignment_score = numpy.zeros((len(qs),len(ss))) 
+
+        for i, query_char in enumerate(qs):
+          for j, subject_char in enumerate(ss):
+            if j == 0 or i == 0:
+                #keeps first row and column consistent throughout all calculations
+                continue
+
+            if query_char == subject_char: 
+                match = self.alignment_score[i-1][j-1] + self.match_score
+            else:
+                match = max(self.alignment_score[i][j-1], self.alignment_score[i-1][j]) 
+ 
+            self.alignment_score[i][j] = match
+
+        return self.alignment_score
+ 
+    def align(self, querySequence: str, subjectSequence: str)->str:
+      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
+      matrix = self(qs, ss)
+
+      qs = [x for x in qs]
+      ss = [x for x in ss]
+
+      if matrix.max() == 0:
+        return "There is no common subsequence!"
+
+      #starts backtrack in bottom right of matrix
+      i, j = len(querySequence), len(subjectSequence)
+
+      subjectAlign = []
+      queryAlign= []
+
+      while matrix[i, j] > 0:
+          if i == 0 and j == 0:
+              break
+          if querySequence[i-1] == subjectSequence[j-1]:
+              queryAlign.append(qs[i-1])
+              subjectAlign.append(ss[j-1])
+              i -= 1
+              j -= 1
+          elif matrix[i-1,j] >= matrix[i, j-1]:
+              i -= 1
+          elif matrix[i, j-1] >= matrix[i-1, j]:
+              j -= 1
+
+      queryAlign = "".join(queryAlign[::-1])
+      subjectAlign = "".join(subjectAlign[::-1])
+
+      return f"{queryAlign}\n{subjectAlign}"
+
+
+
 def frontWhiteSpace(qs: list[str], ss: list[str])->tuple[list[str],list[str]]: 
     #adds leading white space so that matrix works
     qs = rjustlist(qs)
@@ -466,6 +563,7 @@ waterman_smith_beyer = Waterman_Smith_Beyer()
 smith_waterman = Smith_Waterman()
 hirschberg = Hirschberg()
 lowrance_wagner = Lowrance_Wagner()
+longest_common_subsequence = Longest_Common_Subsequence()
 
 if __name__ == "__main__":
     main()

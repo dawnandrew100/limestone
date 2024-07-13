@@ -80,35 +80,3 @@ class LOCALBASE():
     def normalized_similarity(self, querySequence: str, subjectSequence: str)->float:
       similarity = self.similarity(querySequence, subjectSequence)
       return similarity/max(map(len, [querySequence, subjectSequence]))
-
-    def align(self, querySequence: str, subjectSequence: str)->str:
-      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-      matrix = self(qs, ss)
-
-      qs = [x for x in qs]
-      ss = [x for x in ss]
-
-      if matrix.max() == 0:
-        return "There is no local alignment!"
-
-      #finds the largest value closest to bottom right of matrix
-      i, j = list(numpy.where(matrix == matrix.max()))
-      i, j = i[-1], j[-1]
-
-      subjectAlign = []
-      queryAlign= []
-      score = matrix.max()
-
-      while score > 0:
-          score = matrix[i][j]
-          if score == 0:
-              break
-          queryAlign.append(qs[j-1])
-          subjectAlign.append(ss[i-1])
-          i -= 1
-          j -= 1
-
-      queryAlign = "".join(queryAlign[::-1])
-      subjectAlign = "".join(subjectAlign[::-1])
-
-      return f"{queryAlign}\n{subjectAlign}"
