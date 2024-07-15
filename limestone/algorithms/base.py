@@ -61,12 +61,11 @@ class GLOBALBASE():
         return f"{queryAlign}\n{subjectAlign}"
 
 class LOCALBASE():
-    #All local base functions currently only used by Smith Waterman
     def matrix(self, querySequence: str, subjectSequence: str)->list[list[float]]:
       matrix = self(querySequence, subjectSequence)
       return matrix
 
-    def similarity(self, querySequence: str,subjectSequence: str)->float:
+    def similarity(self, querySequence: str, subjectSequence: str)->float:
       matrix  = self(querySequence, subjectSequence)
       return matrix.max()
 

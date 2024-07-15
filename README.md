@@ -7,16 +7,17 @@ This project contains several sequence alignment algorithms that can also produc
 
 **Below is a table of the features of each algorithm.**
 
-| Algorithm                 | Alignment | Matrices | Distance/Similarity/Normalized |
-| ------------------        | --------- | -------- | ------------------------------ |
-|Needleman-Wunsch           |    [x]    |    [x]   |               [x]              |
-|Smith-Waterman             |    [x]    |    [x]   |               [x]              |
-|Waterman-Smith-Beyer       |    [x]    |    [x]   |               [x]              |
-|Wagner-Fischer             |    [x]    |    [x]   |               [x]              |
-|Lowrance-Wagner            |    [x]    |    [x]   |               [x]              |
-|Hamming                    |    [x]    |    [ ]   |               [x]              |
-|Hirschberg                 |    [x]    |    [ ]   |               [ ]              |
-|Longest Common Subsequence |    [x]    |    [x]   |               [x]              |
+| Algorithm                    | Alignment | Matrices | Distance/Similarity/Normalized |
+| ------------------           | --------- | -------- | ------------------------------ |
+|Needleman-Wunsch              |    [x]    |    [x]   |               [x]              |
+|Smith-Waterman                |    [x]    |    [x]   |               [x]              |
+|Waterman-Smith-Beyer          |    [x]    |    [x]   |               [x]              |
+|Wagner-Fischer                |    [x]    |    [x]   |               [x]              |
+|Lowrance-Wagner               |    [x]    |    [x]   |               [x]              |
+|Hamming                       |    [x]    |    [ ]   |               [x]              |
+|Hirschberg                    |    [x]    |    [ ]   |               [ ]              |
+|Longest Common Subsequence    |    [x]    |    [x]   |               [x]              |
+|Shortest Common Supersequence |    [x]    |    [x]   |               [x]              |
 
 ## Algorithms Explained
 [Needleman-Wunsch](https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm)
@@ -34,6 +35,8 @@ This project contains several sequence alignment algorithms that can also produc
 [Hirschberg](https://en.wikipedia.org/wiki/Hirschberg%27s_algorithm)
 
 [Longest Common Subsequence](https://en.wikipedia.org/wiki/Longest_common_subsequence)
+
+[Shortest Common Supersequence](https://en.wikipedia.org/wiki/Shortest_common_supersequence)
 
 # Code Examples
 

@@ -1,5 +1,9 @@
+#built-in
 from __future__ import annotations
+
+#internal dependencies
 from limestone.algorithms.base import GLOBALBASE as __GLOBALBASE, LOCALBASE as __LOCALBASE
+
 try:
     # external dependencies
     import numpy
@@ -9,15 +13,14 @@ except ImportError:
     raise ImportError("Please pip install all dependencies from requirements.txt!")
 
 def main():
-    qqs = "HOLYWATERISABLESSING"
-    sss = "HOLWISBLESSING"
+    qqs = "AGGTAB"
+    sss = "GXTXAYB"
 
-    print(smith_waterman.align(qqs,sss))
-    print(smith_waterman.distance(qqs, sss))
-    print(smith_waterman.similarity(qqs, sss))
-    print(longest_common_subsequence.align(qqs, sss))
-    print(longest_common_subsequence.distance(qqs, sss))
-    print(longest_common_subsequence.similarity(qqs, sss))
+    print(longest_common_subsequence.matrix(qqs, sss))
+    print(longest_common_subsequence.align(qqs,sss))
+    print(shortest_common_supersequence.matrix(qqs, sss))
+    print(shortest_common_supersequence.align(qqs,sss))
+
 
 class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
     def __init__(self)->None:
@@ -53,14 +56,12 @@ class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
               tmin = min(match, lgap, ugap)
 
               self.alignment_score[i][j] = tmin #lowest value is best choice
-
               if match == tmin: #matrix for traceback based on results from scoring matrix
                   self.pointer[i,j] += 2
               if ugap == tmin:
                   self.pointer[i,j] += 3
               if lgap == tmin:
                   self.pointer[i,j] += 4
-
         return self.alignment_score, self.pointer
 
 class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
@@ -98,7 +99,6 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
               tmin = min(match, lgap, ugap, trans)
 
               self.alignment_score[i][j] = tmin #lowest value is best choice
-
               if match == tmin: #matrix for traceback based on results from scoring matrix
                   self.pointer[i,j] += 2
               if ugap == tmin:
@@ -107,7 +107,6 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
                   self.pointer[i,j] += 4
               if trans == tmin:
                   self.pointer[i,j] += 8
-
         return self.alignment_score, self.pointer
 
     def align(self, querySequence: str, subjectSequence: str)->str: 
@@ -120,7 +119,6 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
         j = len(ss)
         queryAlign= []
         subjectAlign = []
-
         while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
           if pointerMatrix[i,j] in [2, 5, 6, 10, 17]:
               #appends match/mismatch then moves to the cell diagonally up and to the left
@@ -146,7 +144,6 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
 
         queryAlign = "".join(queryAlign[::-1])
         subjectAlign = "".join(subjectAlign[::-1])
-
         return f"{queryAlign}\n{subjectAlign}"
 
 class Hamming(__GLOBALBASE):
@@ -184,7 +181,6 @@ class Hamming(__GLOBALBASE):
 
         dist = 0
         dist_array = []
-
         for i, char in enumerate(short):
             if char != long[i]:
                 dist += 1
@@ -194,7 +190,6 @@ class Hamming(__GLOBALBASE):
 
         dist += len(long)-len(short)
         dist_array.extend([1]*(len(long)-len(short)))
-
         return dist, dist_array
 
     def distance(self, querySequence: str|int, subjectSequence: str|int)->int:
@@ -252,14 +247,12 @@ class Needleman_Wunsch(__GLOBALBASE):
               tmin = min(match, lgap, ugap)
 
               self.alignment_score[i][j] = tmin #lowest value is best choice
-
               if match == tmin: #matrix for traceback based on results from scoring matrix
                   self.pointer[i,j] += 2
               if ugap == tmin:
                   self.pointer[i,j] += 3
               if lgap == tmin:
                   self.pointer[i,j] += 4
-
         return self.alignment_score, self.pointer
 
 class Waterman_Smith_Beyer(__GLOBALBASE):
@@ -306,7 +299,6 @@ class Waterman_Smith_Beyer(__GLOBALBASE):
                 tmin = min(matchScore, lgapScore, ugapScore)
 
                 self.alignment_score[i][j] = tmin #lowest value is best choice
-
                 #matrix for traceback based on results from scoring matrix
                 if matchScore == tmin: 
                     self.pointer[i,j] += 2
@@ -314,7 +306,6 @@ class Waterman_Smith_Beyer(__GLOBALBASE):
                     self.pointer[i,j] += 3
                 elif lgapScore == tmin:
                     self.pointer[i,j] += 4
-
         return self.alignment_score, self.pointer
 
 class Hirschberg():
@@ -341,7 +332,6 @@ class Hirschberg():
 
             A_left, B_left = self(qs[:xmid], ss[:ymid])
             A_right, B_right = self(qs[xmid:], ss[ymid:])
-
             return A_left + A_right, B_left + B_right
 
     def _score(self, qs, ss):
@@ -350,7 +340,6 @@ class Hirschberg():
 
         for j in range(1, n + 1):
             score[0][j] = score[0][j - 1] + self.gap_penalty
-
         for i in range(1, m + 1):
             score[1][0] = score[0][0] + self.gap_penalty
             for j in range(1, n + 1):
@@ -359,7 +348,6 @@ class Hirschberg():
                 insert = score[1][j - 1] + self.gap_penalty
                 score[1][j] = max(match, delete, insert)
             score[0] = score[1]
-
         return score[1]
 
     def _align(self, qs, ss):
@@ -373,7 +361,6 @@ class Hirschberg():
         for j in range(1, n + 1):
             score[0][j] = score[0][j - 1] + self.gap_penalty
             pointer[0][j] = 2
-
         for i in range(1, m + 1):
             for j in range(1, n + 1):
                 if qs[i-1] == ss[j-1]: 
@@ -392,7 +379,6 @@ class Hirschberg():
 
         queryAlign, subjectAlign = "", ""
         i, j = m, n
-
         while i > 0 or j > 0:
             if pointer[i][j] == 3:
                 queryAlign = qs[i - 1] + queryAlign
@@ -407,9 +393,7 @@ class Hirschberg():
                 queryAlign = '-' + queryAlign
                 subjectAlign = ss[j - 1] + subjectAlign
                 j -= 1
-
         return queryAlign, subjectAlign
-
     def align(self, qs: str, ss: str) -> str:
         queryAlign, subjectAlign = self(qs, ss)
         return f"{queryAlign}\n{subjectAlign}"
@@ -428,23 +412,19 @@ class Smith_Waterman(__LOCALBASE):
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss))) 
-
         for i, query_char in enumerate(qs):
           for j, subject_char in enumerate(ss):
             if j == 0 or i == 0:
                 #keeps first row and column consistent throughout all calculations
                 continue
-
             if query_char == subject_char: 
                 match = self.alignment_score[i-1][j-1] + self.match_score
             else:
                 match = self.alignment_score[i-1][j-1] - self.mismatch_penalty
- 
             ugap = self.alignment_score[i-1][j] - self.gap_penalty 
             lgap = self.alignment_score[i][j-1] - self.gap_penalty 
             tmax = max(0, match, lgap, ugap) 
             self.alignment_score[i][j] = tmax
-
         return self.alignment_score
  
     def align(self, querySequence: str, subjectSequence: str)->str:
@@ -464,7 +444,6 @@ class Smith_Waterman(__LOCALBASE):
       subjectAlign = []
       queryAlign= []
       score = matrix.max()
-
       while score > 0:
           score = matrix[i][j]
           if score == 0:
@@ -473,10 +452,8 @@ class Smith_Waterman(__LOCALBASE):
           subjectAlign.append(ss[j-1])
           i -= 1
           j -= 1
-
       queryAlign = "".join(queryAlign[::-1])
       subjectAlign = "".join(subjectAlign[::-1])
-
       return f"{queryAlign}\n{subjectAlign}"
 
 class Longest_Common_Subsequence(__LOCALBASE):
@@ -491,18 +468,15 @@ class Longest_Common_Subsequence(__LOCALBASE):
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss))) 
-
         for i, query_char in enumerate(qs):
           for j, subject_char in enumerate(ss):
             if j == 0 or i == 0:
                 #keeps first row and column consistent throughout all calculations
                 continue
-
             if query_char == subject_char: 
                 match = self.alignment_score[i-1][j-1] + self.match_score
             else:
                 match = max(self.alignment_score[i][j-1], self.alignment_score[i-1][j]) 
- 
             self.alignment_score[i][j] = match
 
         return self.alignment_score
@@ -517,31 +491,87 @@ class Longest_Common_Subsequence(__LOCALBASE):
       if matrix.max() == 0:
         return "There is no common subsequence!"
 
-      #starts backtrack in bottom right of matrix
       i, j = len(querySequence), len(subjectSequence)
-
-      subjectAlign = []
-      queryAlign= []
-
+      common_sub_align = []
       while matrix[i, j] > 0:
           if i == 0 and j == 0:
               break
           if querySequence[i-1] == subjectSequence[j-1]:
-              queryAlign.append(qs[i-1])
-              subjectAlign.append(ss[j-1])
+              common_sub_align.append(qs[i-1])
               i -= 1
               j -= 1
           elif matrix[i-1,j] >= matrix[i, j-1]:
               i -= 1
           elif matrix[i, j-1] >= matrix[i-1, j]:
               j -= 1
+      common_sub_align = "".join(common_sub_align[::-1])
+      return f"{common_sub_align}"
 
-      queryAlign = "".join(queryAlign[::-1])
-      subjectAlign = "".join(subjectAlign[::-1])
+class Shortest_Common_Supersequence(__LOCALBASE):
+    def __init__(self):
+        self.match_score = 1
 
-      return f"{queryAlign}\n{subjectAlign}"
+    def __call__(self, querySequence: str, subjectSequence: str)-> NDArray[float64]: 
+        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
+        qs = [x for x in qs]
+        ss = [x for x in ss]
+        qs, ss = frontWhiteSpace(qs, ss) 
 
+        #matrix initialisation
+        self.alignment_score = numpy.zeros((len(qs),len(ss))) 
+        self.alignment_score[:,0] = [x for x in range(len(qs))]
+        self.alignment_score[0,:] = [x for x in range(len(ss))]
 
+        for i, query_char in enumerate(qs):
+          for j, subject_char in enumerate(ss):
+            if j == 0 or i == 0:
+                #keeps first row and column consistent throughout all calculations
+                continue
+            if query_char == subject_char: 
+                match = self.alignment_score[i-1][j-1] + self.match_score
+            else:
+                match = min(self.alignment_score[i][j-1], self.alignment_score[i-1][j]) + self.match_score
+            self.alignment_score[i][j] = match
+        return self.alignment_score
+
+    def align(self, querySequence: str, subjectSequence: str)->str:
+      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
+      matrix = self(qs, ss)
+
+      qs = [x for x in qs]
+      ss = [x for x in ss]
+
+      i, j = len(querySequence), len(subjectSequence)
+      common_super_align= []
+      while i * j > 0:
+          if querySequence[i-1] == subjectSequence[j-1]:
+              common_super_align.append(qs[i-1])
+              i -= 1
+              j -= 1
+          elif matrix[i-1,j] > matrix[i,j-1]:
+              common_super_align.append(ss[j-1])
+              j -= 1
+          else:
+              common_super_align.append(qs[i-1])
+              i -= 1
+      while i > 0:
+          common_super_align.append(qs[i-1])
+          i -= 1
+      while j > 0:
+          common_super_align.append(ss[j-1])
+          j -= 1
+
+      common_super_align = "".join(common_super_align[::-1])
+      return f"{common_super_align}"
+
+    def similarity(self, querySequence: str, subjectSequence: str)->float:
+      matrix  = longest_common_subsequence(querySequence, subjectSequence)
+      return matrix.max()
+
+    def distance(self, querySequence: str, subjectSequence: str)->float:
+      matrix = self(querySequence, subjectSequence)
+      sim = self.similarity(querySequence, subjectSequence)
+      return (matrix.max() - sim)/2
 
 def frontWhiteSpace(qs: list[str], ss: list[str])->tuple[list[str],list[str]]: 
     #adds leading white space so that matrix works
@@ -564,6 +594,7 @@ smith_waterman = Smith_Waterman()
 hirschberg = Hirschberg()
 lowrance_wagner = Lowrance_Wagner()
 longest_common_subsequence = Longest_Common_Subsequence()
+shortest_common_supersequence = Shortest_Common_Supersequence()
 
 if __name__ == "__main__":
     main()

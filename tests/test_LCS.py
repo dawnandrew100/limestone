@@ -3,9 +3,21 @@ import unittest
 from limestone import longest_common_subsequence
 
 class TestLCS(unittest.TestCase):
-    def test_distance_diff(self):
+    def test_distance_diff1(self):
         dist = longest_common_subsequence.distance("ACTG", "FHYU")
         self.assertEqual(dist, 4.0)
+
+    def test_distance_diff2(self):
+        dist = longest_common_subsequence.distance("ACTG", "AHYG")
+        self.assertEqual(dist, 2.0)
+
+    def test_distance_diff3(self):
+        dist = longest_common_subsequence.distance("ACTG", "ACYU")
+        self.assertEqual(dist, 2.0)
+
+    def test_distance_diff4(self):
+        dist = longest_common_subsequence.distance("ACTG", "AHYU")
+        self.assertEqual(dist, 3.0)
 
     def test_similarity_diff(self):
         sim = longest_common_subsequence.similarity("ACTG", "FHYU")
@@ -61,19 +73,19 @@ class TestLCS(unittest.TestCase):
 
     def test_align(self):
         alignment = longest_common_subsequence.align("BA", "ABA")
-        self.assertEqual(alignment, "BA\nBA")
+        self.assertEqual(alignment, "BA")
 
     def test_align2(self):
         alignment = longest_common_subsequence.align("AGTACGCA", "TATGC")
-        self.assertEqual(alignment, "ATGC\nATGC")
+        self.assertEqual(alignment, "ATGC")
     
     def test_align3(self):
         alignment = longest_common_subsequence.align("ATCGATCGATGCTAGCTA", "ATGATCGAGCTA")
-        self.assertEqual(alignment, "ATGATCGAGCTA\nATGATCGAGCTA")
+        self.assertEqual(alignment, "ATGATCGAGCTA")
     
     def test_align4(self):
         alignment = longest_common_subsequence.align("ATCGATCGATGCTAGCTA", "ATGATCGAGCTAVJONVJNV")
-        self.assertEqual(alignment, "ATGATCGAGCTA\nATGATCGAGCTA")
+        self.assertEqual(alignment, "ATGATCGAGCTA")
 
 if __name__ == '__main__':
     unittest.main()
