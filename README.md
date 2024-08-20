@@ -63,7 +63,7 @@ print(hamming.normalized_similarity(qs, ss))
 
 **Needleman-Wunsch**
 ```python
-from limestone import needlemanWunsch
+from limestone import needleman_wunsch
 
 print(needleman_wunsch.distance("ACTG","FHYU"))
 # 4
