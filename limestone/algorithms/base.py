@@ -27,15 +27,11 @@ class GLOBALBASE():
       return sim/max(map(len, [querySequence, subjectSequence]))
 
     def align(self, querySequence: str, subjectSequence: str)->str: 
-        qs,ss= map(lambda x: x.upper(), [querySequence, subjectSequence])
-        _, pointerMatrix = self(qs, ss)
+        _, pointerMatrix = self(querySequence, subjectSequence)
 
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        i = len(qs)
-        j = len(ss)
-        queryAlign= []
-        subjectAlign = []
+        qs, ss = [x.upper() for x in querySequence], [x.upper() for x in subjectSequence]
+        i, j = len(qs), len(ss)
+        queryAlign, subjectAlign = [], []
 
         while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
           if pointerMatrix[i,j] in [2, 5, 6, 9]:

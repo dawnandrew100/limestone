@@ -27,10 +27,9 @@ class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
         self.gap_penalty = 1
 
     def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64],NDArray[float64]]:
-        qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss)
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss)))
@@ -69,10 +68,9 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
         self.gap_penalty = 1
 
     def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64],NDArray[float64]]:
-        qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss)
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss)))
@@ -110,15 +108,11 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
         return self.alignment_score, self.pointer
 
     def align(self, querySequence: str, subjectSequence: str)->str: 
-        qs,ss= map(lambda x: x.upper(), [querySequence, subjectSequence])
-        _, pointerMatrix = self(qs, ss)
+        _, pointerMatrix = self(querySequence, subjectSequence)
 
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        i = len(qs)
-        j = len(ss)
-        queryAlign= []
-        subjectAlign = []
+        qs, ss = [x.upper() for x in querySequence], [x.upper() for x in subjectSequence]
+        i, j = len(qs), len(ss)
+        queryAlign, subjectAlign = [], []
         while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
           if pointerMatrix[i,j] in [2, 5, 6, 10, 17]:
               #appends match/mismatch then moves to the cell diagonally up and to the left
@@ -168,7 +162,7 @@ class Hamming(__GLOBALBASE):
         if self.__int_pair(querySequence, subjectSequence):
             qs, ss = bin(querySequence), bin(subjectSequence)
         else:
-            qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
+            qs,ss = [x.upper() for x in querySequence], [x.upper() for x in subjectSequence]
 
         if len(qs) == 1 and len(ss) == 1:
             dist = 1 if qs != ss else 0
@@ -218,10 +212,9 @@ class Needleman_Wunsch(__GLOBALBASE):
         self.gap_penalty = gap_penalty
 
     def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64],NDArray[float64]]:
-        qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss)
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss)))
@@ -263,10 +256,9 @@ class Waterman_Smith_Beyer(__GLOBALBASE):
         self.continue_gap_penalty = continue_gap_penalty
 
     def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64], NDArray[float64]]:
-        qs,ss= map(lambda x: x.upper(), [querySequence,subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss) 
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss)))
@@ -405,10 +397,9 @@ class Smith_Waterman(__LOCALBASE):
         self.gap_penalty = gap_penalty
 
     def __call__(self, querySequence: str, subjectSequence: str)-> NDArray[float64]: 
-        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss) 
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss))) 
@@ -428,12 +419,9 @@ class Smith_Waterman(__LOCALBASE):
         return self.alignment_score
  
     def align(self, querySequence: str, subjectSequence: str)->str:
-      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-      matrix = self(qs, ss)
+      matrix = self(querySequence, subjectSequence)
 
-      qs = [x for x in qs]
-      ss = [x for x in ss]
-
+      qs, ss = [x.upper() for x in querySequence], [x.upper() for x in subjectSequence]
       if matrix.max() == 0:
         return "There is no local alignment!"
 
@@ -461,10 +449,9 @@ class Longest_Common_Subsequence(__LOCALBASE):
         self.match_score = 1
 
     def __call__(self, querySequence: str, subjectSequence: str)-> NDArray[float64]: 
-        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss) 
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss))) 
@@ -482,12 +469,9 @@ class Longest_Common_Subsequence(__LOCALBASE):
         return self.alignment_score
  
     def align(self, querySequence: str, subjectSequence: str)->str:
-      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-      matrix = self(qs, ss)
+      matrix = self(querySequence, subjectSequence)
 
-      qs = [x for x in qs]
-      ss = [x for x in ss]
-
+      qs = [x.upper() for x in querySequence]
       if matrix.max() == 0:
         return "There is no common subsequence!"
 
@@ -512,10 +496,9 @@ class Shortest_Common_Supersequence(__LOCALBASE):
         self.match_score = 1
 
     def __call__(self, querySequence: str, subjectSequence: str)-> NDArray[float64]: 
-        qs,ss = map(lambda x: x.upper(), [querySequence,subjectSequence])
-        qs = [x for x in qs]
-        ss = [x for x in ss]
-        qs, ss = frontWhiteSpace(qs, ss) 
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
 
         #matrix initialisation
         self.alignment_score = numpy.zeros((len(qs),len(ss))) 
@@ -535,11 +518,9 @@ class Shortest_Common_Supersequence(__LOCALBASE):
         return self.alignment_score
 
     def align(self, querySequence: str, subjectSequence: str)->str:
-      qs,ss = map(lambda x: x.upper(), [querySequence, subjectSequence])
-      matrix = self(qs, ss)
+      matrix = self(querySequence, subjectSequence)
 
-      qs = [x for x in qs]
-      ss = [x for x in ss]
+      qs, ss = [x.upper() for x in querySequence], [x.upper() for x in subjectSequence]
 
       i, j = len(querySequence), len(subjectSequence)
       common_super_align= []
@@ -572,19 +553,6 @@ class Shortest_Common_Supersequence(__LOCALBASE):
       matrix = self(querySequence, subjectSequence)
       sim = self.similarity(querySequence, subjectSequence)
       return (matrix.max() - sim)/2
-
-def frontWhiteSpace(qs: list[str], ss: list[str])->tuple[list[str],list[str]]: 
-    #adds leading white space so that matrix works
-    qs = rjustlist(qs)
-    ss = rjustlist(ss)
-    return qs, ss
-
-def ljustlist(sequence: list[str], n: int, fillvalue='')->list[str]:
-    return sequence + [fillvalue] * (n - len(sequence)) 
-
-def rjustlist(sequence: list[str], fillvalue='')->list[str]:
-    return [fillvalue] + sequence
-
 
 hamming = Hamming()
 wagner_fischer = Wagner_Fischer()
