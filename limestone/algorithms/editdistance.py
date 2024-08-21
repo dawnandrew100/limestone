@@ -114,23 +114,23 @@ class Lowrance_Wagner(__GLOBALBASE): #Damerau-Levenshtein distance
         i, j = len(qs), len(ss)
         queryAlign, subjectAlign = [], []
         while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
-          if pointerMatrix[i,j] in [2, 5, 6, 10, 17]:
+          if pointerMatrix[i,j] in [2, 5, 6, 10, 9, 13, 14, 17]:
               #appends match/mismatch then moves to the cell diagonally up and to the left
               queryAlign.append(qs[i-1])
               subjectAlign.append(ss[j-1])
               i -= 1
               j -= 1
-          elif pointerMatrix[i,j] in [8, 10, 11, 12, 17]:
+          elif pointerMatrix[i,j] in [8, 10, 11, 12, 13, 14, 15, 17]:
               queryAlign.extend([qs[i-1],qs[i-2]])
               subjectAlign.extend([ss[j-2],ss[j-1]])
               i -= 2
               j-= 2
-          elif pointerMatrix[i,j] in [3, 5, 7, 11, 17]:
+          elif pointerMatrix[i,j] in [3, 5, 7, 11, 9, 13, 15, 17]:
               #appends gap and accompanying nucleotide, then moves to the cell above
               subjectAlign.append('-')
               queryAlign.append(qs[i-1])
               i -= 1
-          elif pointerMatrix[i,j] in [4, 6, 7,12, 17]:
+          elif pointerMatrix[i,j] in [4, 6, 7, 12, 9, 14, 15, 17]:
               #appends gap and accompanying nucleotide, then moves to the cell to the left
               subjectAlign.append(ss[j-1])
               queryAlign.append('-')
