@@ -16,6 +16,8 @@ This project contains several sequence alignment algorithms that can also produc
 |Lowrance-Wagner               |    [x]    |    [x]   |               [x]              |
 |Hamming                       |    [x]    |    [ ]   |               [x]              |
 |Hirschberg                    |    [x]    |    [ ]   |               [ ]              |
+|Jaro                          |    [ ]    |    [x]   |               [x]              |
+|Jaro Winkler                  |    [ ]    |    [x]   |               [x]              |
 |Longest Common Subsequence    |    [x]    |    [x]   |               [x]              |
 |Shortest Common Supersequence |    [x]    |    [x]   |               [x]              |
 
@@ -33,6 +35,8 @@ This project contains several sequence alignment algorithms that can also produc
 [Hamming](https://en.wikipedia.org/wiki/Hamming_distance)
 
 [Hirschberg](https://en.wikipedia.org/wiki/Hirschberg%27s_algorithm)
+
+[Jaro & Jaro-Winkler](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
 
 [Longest Common Subsequence](https://en.wikipedia.org/wiki/Longest_common_subsequence)
 
