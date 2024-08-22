@@ -390,6 +390,98 @@ class Hirschberg():
         queryAlign, subjectAlign = self(qs, ss)
         return f"{queryAlign}\n{subjectAlign}"
 
+class Jaro():
+  def __init__(self):
+    self.match_score = 1
+    self.winkler = False
+      
+  def __call__(self, querySequence: str, subjectSequence: str) -> tuple[int, int]:
+      qs, ss = (x.upper() for x in [querySequence, subjectSequence])
+      if qs == ss:
+          return -1, 0
+      len1, len2 = len(querySequence), len(subjectSequence)
+      max_dist = max(len1, len2)//2 - 1
+
+      matches = 0
+      array_qs = [False] * len1
+      array_ss = [False] * len2
+      for i in range(len1):
+          start = max(0, i - max_dist)
+          end = min(len2, i + max_dist + 1)
+          for j in range(start, end):
+              if qs[i] == ss[j] and array_ss[j] == 0:
+                  array_qs[i] = array_ss[j] = True
+                  matches += 1
+                  break
+      if matches == 0:
+          return 0, 0
+          
+      transpositions = 0
+      comparison = 0
+      for i in range(len1):
+          if array_qs[i]:
+              while not array_ss[comparison]:
+                  comparison += 1
+              if qs[i] != ss[comparison]:
+                  transpositions += 1
+              comparison += 1
+      return matches, transpositions//2
+
+  def similarity(self, querySequence: str, subjectSequence: str) -> float:
+      matches, t = self(querySequence, subjectSequence)
+      if matches == 0:
+          return 0.0
+      if matches == -1:
+          return 1.0
+      jaro_sim = (1/3)*((matches/len(querySequence))+(matches/len(subjectSequence))+((matches-t)/matches))
+      if not self.winkler:
+          return jaro_sim
+      prefix_matches = 0
+      for i in range(4):
+          if querySequence[i] != subjectSequence[i] or i > len(subjectSequence) - 1:
+              break
+          prefix_matches += 1
+      return jaro_sim + prefix_matches*self.scaling_factor*(1-jaro_sim)
+
+  def normalized_similarity(self, querySequence: str, subjectSequence: str) -> float:
+      return round(self.similarity(querySequence, subjectSequence), 2)
+      
+  def distance(self, querySequence: str, subjectSequence: str) -> float:
+      return 1 - self.similarity(querySequence, subjectSequence)
+
+  def normalized_distance(self, querySequence: str, subjectSequence: str) -> float:
+      return round(self.distance(querySequence, subjectSequence), 2)
+
+  def matrix(self, querySequence: str, subjectSequence: str) -> NDArray[float64]:
+    #dynamic programming variant to show all matches
+    qs,ss = [""], [""] 
+    qs.extend([x.upper() for x in querySequence])
+    ss.extend([x.upper() for x in subjectSequence])
+    max_match_dist = max(0, (max(len(ss)-1, len(qs)-1)//2)-1)
+
+    #matrix initialisation
+    self.alignment_score = numpy.zeros((len(qs),len(ss)))
+    for i, query_char in enumerate(qs):
+      for j, subject_char in enumerate(ss):
+          if i == 0 or j == 0:
+              #keeps first row and column consistent throughout all calculations
+              continue
+          dmatch = self.alignment_score[i-1][j-1]
+          start = max(1, i-max_match_dist)
+          trans_match = ss[start:start+(2*max_match_dist)]
+          if query_char == subject_char or query_char in trans_match:
+            dmatch += 1
+
+          self.alignment_score[i][j] = dmatch
+    return self.alignment_score
+
+class JaroWinkler(Jaro):
+    def __init__(self, scaling_factor = 0.1):
+        self.match_score = 1
+        self.winkler = True
+        #p should not exceed 0.25 else similarity could be larger than 1
+        self.scaling_factor = scaling_factor
+
 class Smith_Waterman(__LOCALBASE):
     def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, gap_penalty:int = 2)->None:
         self.match_score = match_score
@@ -560,6 +652,8 @@ needleman_wunsch = Needleman_Wunsch()
 waterman_smith_beyer = Waterman_Smith_Beyer()
 smith_waterman = Smith_Waterman()
 hirschberg = Hirschberg()
+jaro = Jaro()
+jaro_winkler = JaroWinkler()
 lowrance_wagner = Lowrance_Wagner()
 longest_common_subsequence = Longest_Common_Subsequence()
 shortest_common_supersequence = Shortest_Common_Supersequence()
