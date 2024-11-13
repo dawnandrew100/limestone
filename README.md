@@ -10,6 +10,7 @@ This project contains several sequence alignment algorithms that can also produc
 | Algorithm                    | Alignment | Matrices | Distance/Similarity/Normalized |
 | ------------------           | --------- | -------- | ------------------------------ |
 |Needleman-Wunsch              |    [x]    |    [x]   |               [x]              |
+|Gotoh (Global)                |    [x]    |    [x]   |               [x]              |
 |Smith-Waterman                |    [x]    |    [x]   |               [x]              |
 |Waterman-Smith-Beyer          |    [x]    |    [x]   |               [x]              |
 |Wagner-Fischer                |    [x]    |    [x]   |               [x]              |
@@ -23,6 +24,8 @@ This project contains several sequence alignment algorithms that can also produc
 
 ## Algorithms Explained
 [Needleman-Wunsch](https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm)
+
+[Gotoh -Global](https://helios2.mi.parisdescartes.fr/~lomn/Cours/BI/Material/gap-penalty-gotoh.pdf)
 
 [Smith-Waterman ](https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm)
 
@@ -112,3 +115,22 @@ It is possible that their implementation has an issue and not mine but I wanted 
 During the beginning of this project I thought that the Levenshtein distance was an algorithm, but it is the end result that is being calculated with an approach such as Wagner-Fischer which uses Needleman-Wunsch-esque matrices to calculate the Levenshtein distance.
 Thusly, the Levenshtein distance implementation has been switched with the Wagner-Fischer algorithm.
 Damerau-Levenshtein distance is found using the Lowrance-Wagner algorithm.
+
+Will have to do some experimenting but it appears that the normalized distance/similarity results have undefined behaviour if the match score is not 0.
+
+For the following sequences
+```
+    qqs = "AGCTCATCAGTCATGCATCCT"
+    sss = "CAG"
+```
+The Gotoh algorithm produces a suboptimal alignment of 
+```
+AGCTCATCAGTCATGCATCCT
+---------------CAG---
+```
+Correct alignment should be
+```
+AGCTCATCAGTCATGCATCCT
+-------CAG-----------
+```
+

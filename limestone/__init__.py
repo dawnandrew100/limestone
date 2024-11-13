@@ -11,3 +11,4 @@ from limestone.algorithms.editdistance import wagner_fischer
 from limestone.algorithms.editdistance import waterman_smith_beyer
 from limestone.algorithms.editdistance import longest_common_subsequence
 from limestone.algorithms.editdistance import shortest_common_supersequence
+from limestone.algorithms.editdistance import gotoh

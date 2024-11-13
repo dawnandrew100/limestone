@@ -301,7 +301,7 @@ class Waterman_Smith_Beyer(__GLOBALBASE):
         return self.alignment_score, self.pointer
 
 class Gotoh(__GLOBALBASE):
-    def __init__(self, match_score:int = 2, mismatch_penalty:int = 1, new_gap_penalty:int = 2, continue_gap_penalty: int = 1)->None:
+    def __init__(self, match_score:int = 0, mismatch_penalty:int = 1, new_gap_penalty:int = 2, continue_gap_penalty: int = 1)->None:
         self.match_score = match_score
         self.mismatch_penalty = mismatch_penalty
         self.new_gap_penalty = new_gap_penalty
@@ -312,26 +312,27 @@ class Gotoh(__GLOBALBASE):
         qs.extend([x.upper() for x in querySequence])
         ss.extend([x.upper() for x in subjectSequence])
 
+        #LETS GIVE POSITIVES A TRY FOR THE TESTS
         #matrix initialisation
-        self.D = numpy.full((len(qs),len(ss)), -numpy.inf)
-        self.P = numpy.full((len(qs), len(ss)), -numpy.inf)
+        self.D = numpy.full((len(qs),len(ss)), numpy.inf)
+        self.P = numpy.full((len(qs), len(ss)), numpy.inf)
         self.P[:,0] = 0
-        self.Q = numpy.full((len(qs), len(ss)), -numpy.inf)
+        self.Q = numpy.full((len(qs), len(ss)), numpy.inf)
         self.Q[0,:] = 0
         self.pointer = numpy.zeros((len(qs), len(ss)))
         self.pointer[:,0] = 3
         self.pointer[0,:] = 4
         #initialisation of starter values for first column and first row
-        self.D[:,0] = [(-self.continue_gap_penalty * n - self.new_gap_penalty) for n in range(len(qs))]
-        self.D[0,:] = [(-self.continue_gap_penalty * n - self.new_gap_penalty) for n in range(len(ss))]
+        self.D[:,0] = [(self.continue_gap_penalty * n + self.new_gap_penalty) for n in range(len(qs))]
+        self.D[0,:] = [(self.continue_gap_penalty * n + self.new_gap_penalty) for n in range(len(ss))]
         self.D[0, 0] = 0
 
         for i in range(1, len(qs)):
           for j in range(1, len(ss)):
-              match = self.D[i - 1, j - 1] + (self.match_score if qs[i] == ss[j] else -self.mismatch_penalty)
-              self.P[i, j] = max(self.D[i - 1, j] - self.new_gap_penalty - self.continue_gap_penalty, self.P[i - 1, j] - self.continue_gap_penalty)
-              self.Q[i, j] = max(self.D[i, j - 1] - self.new_gap_penalty - self.continue_gap_penalty, self.Q[i, j - 1] - self.continue_gap_penalty)
-              self.D[i, j] = max(match, self.P[i, j], self.Q[i, j])
+              match = self.D[i - 1, j - 1] + (-self.match_score if qs[i] == ss[j] else self.mismatch_penalty)
+              self.P[i, j] = min(self.D[i - 1, j] + self.new_gap_penalty + self.continue_gap_penalty, self.P[i - 1, j] + self.continue_gap_penalty)
+              self.Q[i, j] = min(self.D[i, j - 1] + self.new_gap_penalty + self.continue_gap_penalty, self.Q[i, j - 1] + self.continue_gap_penalty)
+              self.D[i, j] = min(match, self.P[i, j], self.Q[i, j])
               if self.D[i, j] == match: #matrix for traceback based on results from scoring matrix
                   self.pointer[i, j] += 2
               if self.D[i, j] == self.P[i, j]:
