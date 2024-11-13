@@ -17,8 +17,9 @@ def main():
     sss = "CATGCATCGAC"
 
     print(gotoh.align(qqs, sss))
-    d, p, q, point = gotoh(qqs, sss)
-    print(f"{d}\n,{p}\n,{q}\n,{point}")
+    print(gotoh.distance(qqs, sss))
+    print(gotoh.normalized_distance(qqs, sss))
+    print(gotoh.similarity(qqs, sss))
 
 
 class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
@@ -299,7 +300,7 @@ class Waterman_Smith_Beyer(__GLOBALBASE):
                     self.pointer[i,j] += 4
         return self.alignment_score, self.pointer
 
-class Gotoh():
+class Gotoh(__GLOBALBASE):
     def __init__(self, match_score:int = 2, mismatch_penalty:int = 1, new_gap_penalty:int = 2, continue_gap_penalty: int = 1)->None:
         self.match_score = match_score
         self.mismatch_penalty = mismatch_penalty
@@ -339,6 +340,13 @@ class Gotoh():
                   self.pointer[i, j] += 4
         return self.D, self.P, self.Q, self.pointer
 
+    def matrix(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64], NDArray[float64], NDArray[float64]]:
+        D, P, Q, _ = self(querySequence, subjectSequence)
+        return D, P, Q
+
+    def distance(self, querySequence: str, subjectSequence: str)->float:
+      D,_, _, _ = self(querySequence, subjectSequence)
+      return float(D[D.shape[0]-1,D.shape[1]-1])
 
     def align(self, querySequence: str, subjectSequence: str)->str: 
         _, _, _, pointerMatrix = self(querySequence, subjectSequence)
