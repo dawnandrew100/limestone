@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "limestone"
-version = "0.8.0"
+version = "0.11.0"
 authors = [
 	{ name ="Andrew Hennis", email="andrew.mr.hennis@gmail.com" },
 ]
-desctiption = "Simple python implementation of text alignment and phylo tree creation"
+desctiption = "Simple python implementation of text alignment meant for increased functionality."
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -17,7 +17,7 @@ classifiers = [
 	"Operating System :: OS Independent",
 ]
 dependencies = [
-  "numpy"
+  "numpy >= 2.0.0"
 ]
 
 [project.urls]

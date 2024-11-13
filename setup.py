@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='limestone',
-    version='0.8.0',
+    version='0.11.0',
 
     packages=['limestone'],
     package_data={'': ['*.py']},

@@ -13,13 +13,12 @@ except ImportError:
     raise ImportError("Please pip install all dependencies from requirements.txt!")
 
 def main():
-    qqs = "AGGTAB"
-    sss = "GXTXAYB"
+    qqs = "GCATGCCAT"
+    sss = "CATGCATCGAC"
 
-    print(longest_common_subsequence.matrix(qqs, sss))
-    print(longest_common_subsequence.align(qqs,sss))
-    print(shortest_common_supersequence.matrix(qqs, sss))
-    print(shortest_common_supersequence.align(qqs,sss))
+    print(gotoh.align(qqs, sss))
+    d, p, q, point = gotoh(qqs, sss)
+    print(f"{d}\n,{p}\n,{q}\n,{point}")
 
 
 class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
@@ -299,6 +298,77 @@ class Waterman_Smith_Beyer(__GLOBALBASE):
                 elif lgapScore == tmin:
                     self.pointer[i,j] += 4
         return self.alignment_score, self.pointer
+
+class Gotoh():
+    def __init__(self, match_score:int = 2, mismatch_penalty:int = 1, new_gap_penalty:int = 2, continue_gap_penalty: int = 1)->None:
+        self.match_score = match_score
+        self.mismatch_penalty = mismatch_penalty
+        self.new_gap_penalty = new_gap_penalty
+        self.continue_gap_penalty = continue_gap_penalty
+
+    def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64],NDArray[float64],NDArray[float64],NDArray[float64]]:
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
+
+        #matrix initialisation
+        self.D = numpy.full((len(qs),len(ss)), -numpy.inf)
+        self.P = numpy.full((len(qs), len(ss)), -numpy.inf)
+        self.P[:,0] = 0
+        self.Q = numpy.full((len(qs), len(ss)), -numpy.inf)
+        self.Q[0,:] = 0
+        self.pointer = numpy.zeros((len(qs), len(ss)))
+        self.pointer[:,0] = 3
+        self.pointer[0,:] = 4
+        #initialisation of starter values for first column and first row
+        self.D[:,0] = [(-self.continue_gap_penalty * n - self.new_gap_penalty) for n in range(len(qs))]
+        self.D[0,:] = [(-self.continue_gap_penalty * n - self.new_gap_penalty) for n in range(len(ss))]
+        self.D[0, 0] = 0
+
+        for i in range(1, len(qs)):
+          for j in range(1, len(ss)):
+              match = self.D[i - 1, j - 1] + (self.match_score if qs[i] == ss[j] else -self.mismatch_penalty)
+              self.P[i, j] = max(self.D[i - 1, j] - self.new_gap_penalty - self.continue_gap_penalty, self.P[i - 1, j] - self.continue_gap_penalty)
+              self.Q[i, j] = max(self.D[i, j - 1] - self.new_gap_penalty - self.continue_gap_penalty, self.Q[i, j - 1] - self.continue_gap_penalty)
+              self.D[i, j] = max(match, self.P[i, j], self.Q[i, j])
+              if self.D[i, j] == match: #matrix for traceback based on results from scoring matrix
+                  self.pointer[i, j] += 2
+              if self.D[i, j] == self.P[i, j]:
+                  self.pointer[i, j] += 3
+              if self.D[i, j] == self.Q[i, j]:
+                  self.pointer[i, j] += 4
+        return self.D, self.P, self.Q, self.pointer
+
+
+    def align(self, querySequence: str, subjectSequence: str)->str: 
+        _, _, _, pointerMatrix = self(querySequence, subjectSequence)
+
+        qs, ss = [x.upper() for x in querySequence], [x.upper() for x in subjectSequence]
+        i, j = len(qs), len(ss)
+        queryAlign, subjectAlign = [], []
+
+        while i > 0 or j > 0: #looks for match/mismatch/gap starting from bottom right of matrix
+          if pointerMatrix[i,j]in [3, 5, 7, 9]:
+              #appends gap and accompanying nucleotide, then moves to the cell above
+              subjectAlign.append('-')
+              queryAlign.append(qs[i-1])
+              i -= 1
+          elif pointerMatrix[i,j] in [4, 6, 7, 9]:
+              #appends gap and accompanying nucleotide, then moves to the cell to the left
+              subjectAlign.append(ss[j-1])
+              queryAlign.append('-')
+              j -= 1
+          elif pointerMatrix[i,j] in [2, 5, 6, 9]:
+              #appends match/mismatch then moves to the cell diagonally up and to the left
+              queryAlign.append(qs[i-1])
+              subjectAlign.append(ss[j-1])
+              i -= 1
+              j -= 1
+
+        queryAlign = "".join(queryAlign[::-1])
+        subjectAlign = "".join(subjectAlign[::-1])
+
+        return f"{queryAlign}\n{subjectAlign}"
 
 class Hirschberg():
     def __init__(self, match_score: int = 1, mismatch_penalty: int = -1, gap_penalty: int = -2)->None:
@@ -657,6 +727,7 @@ jaro_winkler = JaroWinkler()
 lowrance_wagner = Lowrance_Wagner()
 longest_common_subsequence = Longest_Common_Subsequence()
 shortest_common_supersequence = Shortest_Common_Supersequence()
+gotoh = Gotoh()
 
 if __name__ == "__main__":
     main()
