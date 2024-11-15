@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone import jaro_winkler
+from goombay import jaro_winkler
 
 class TestJaroWinkler(unittest.TestCase):
     def test_distance_diff(self):

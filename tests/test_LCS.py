@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone import longest_common_subsequence
+from goombay import longest_common_subsequence
 
 class TestLCS(unittest.TestCase):
     def test_distance_diff1(self):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone import hamming
+from goombay import hamming
 
 class TestHamming(unittest.TestCase):    
     def test_distance_diff(self):

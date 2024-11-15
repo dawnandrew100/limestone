@@ -1,7 +1,7 @@
 from random import randint, choice
 from string import ascii_lowercase
 from timeit import timeit
-import limestone as ls
+import goombay as gb
 
 """
 This module displays the run time for the distance metric of each algorithm that has a distance metric
@@ -13,40 +13,40 @@ test_strings1 = ["".join(choice(ascii_lowercase) for _ in range(randint(50,100))
 test_strings2 = ["".join(choice(ascii_lowercase) for _ in range(randint(50,100))) for _ in range(100)]
 
 def test_NW():
-    [ls.needleman_wunsch.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.needleman_wunsch.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_SW():
-    [ls.smith_waterman.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.smith_waterman.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_WSB():
-    [ls.waterman_smith_beyer.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.waterman_smith_beyer.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_WF():
-    [ls.wagner_fischer.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.wagner_fischer.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_LW():
-    [ls.lowrance_wagner.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.lowrance_wagner.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_H():
-    [ls.hamming.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.hamming.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_J():
-    [ls.jaro.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.jaro.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_JW():
-    [ls.jaro_winkler.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.jaro_winkler.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_LCS():
-    [ls.longest_common_subsequence.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.longest_common_subsequence.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_SCS():
-    [ls.shortest_common_supersequence.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.shortest_common_supersequence.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_G():
-    [ls.gotoh.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.gotoh.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def test_GL():
-    [ls.gotoh_local.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+    [gb.gotoh_local.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
 def main():
     print("Each of the following tests creates a list comprehension of 100 sequences that are 50 to 100 charachters each")

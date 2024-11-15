@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone import waterman_smith_beyer
+from goombay import waterman_smith_beyer
 
 class TestWatermanSmithBayer(unittest.TestCase):
     def test_distance_diff(self):

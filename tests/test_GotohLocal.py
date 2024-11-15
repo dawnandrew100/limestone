@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 import unittest
-from limestone import gotoh_local
+from goombay import gotoh_local
 
 class TestGotohLocal(unittest.TestCase):
     def test_distance_diff(self):

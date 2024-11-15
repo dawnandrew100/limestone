@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 #internal dependencies
-from limestone.algorithms.base import GLOBALBASE as __GLOBALBASE, LOCALBASE as __LOCALBASE
+from goombay.algorithms.base import GLOBALBASE as __GLOBALBASE, LOCALBASE as __LOCALBASE
 
 try:
     # external dependencies

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone import jaro
+from goombay import jaro
 
 class TestJaro(unittest.TestCase):
     def test_distance_diff(self):

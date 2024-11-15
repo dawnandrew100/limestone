@@ -1,6 +1,6 @@
 from __future__ import annotations
 import unittest
-from limestone import shortest_common_supersequence
+from goombay import shortest_common_supersequence
 
 class TestSCS(unittest.TestCase):
     def test_distance_diff1(self):

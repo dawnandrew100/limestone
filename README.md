@@ -52,7 +52,7 @@ This project contains several sequence alignment algorithms that can also produc
 
 **Hamming Distance**
 ```python
-from limestone import hamming
+from goombay import hamming
 
 qs = "AFTG"
 ss = "ACTG"
@@ -73,7 +73,7 @@ print(hamming.normalized_similarity(qs, ss))
 
 **Needleman-Wunsch**
 ```python
-from limestone import needleman_wunsch
+from goombay import needleman_wunsch
 
 print(needleman_wunsch.distance("ACTG","FHYU"))
 # 4

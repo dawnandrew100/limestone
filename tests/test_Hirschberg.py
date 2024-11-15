@@ -1,7 +1,7 @@
 from __future__ import annotations
 import unittest
-from limestone import needleman_wunsch
-from limestone import hirschberg
+from goombay import needleman_wunsch
+from goombay import hirschberg
 
 class TestHirschberg(unittest.TestCase):
         
