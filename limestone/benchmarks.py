@@ -42,6 +42,12 @@ def test_LCS():
 def test_SCS():
     [ls.shortest_common_supersequence.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
 
+def test_G():
+    [ls.gotoh.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+
+def test_GL():
+    [ls.gotoh_local.distance(a, b) for a, b in zip(test_strings1, test_strings2)]
+
 def main():
     print("Each of the following tests creates a list comprehension of 100 sequences that are 50 to 100 charachters each")
     print(f"Needleman Wunsch test: Time = {timeit('test_NW()', globals = globals(), number=1):0.4f}")
@@ -54,6 +60,8 @@ def main():
     print(f"Jaro Winkler test: Time = {timeit('test_JW()', globals = globals(), number=1):0.4f}")
     print(f"Longest Common Subsequence test: Time = {timeit('test_LCS()', globals = globals(), number=1):0.4f}")
     print(f"Shortest Common Supersequence test: Time = {timeit('test_SCS()', globals = globals(), number=1):0.4f}")
+    print(f"Gotoh (Global) test: Time = {timeit('test_G()', globals = globals(), number=1):0.4f}")
+    print(f"Gotoh (Local) test: Time = {timeit('test_GL()', globals = globals(), number=1):0.4f}")
 
 if __name__ == "__main__":
     main()

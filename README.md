@@ -11,6 +11,7 @@ This project contains several sequence alignment algorithms that can also produc
 | ------------------           | --------- | -------- | ------------------------------ |
 |Needleman-Wunsch              |    [x]    |    [x]   |               [x]              |
 |Gotoh (Global)                |    [x]    |    [x]   |               [x]              |
+|Gotoh (Local)                 |    [x]    |    [x]   |               [x]              |
 |Smith-Waterman                |    [x]    |    [x]   |               [x]              |
 |Waterman-Smith-Beyer          |    [x]    |    [x]   |               [x]              |
 |Wagner-Fischer                |    [x]    |    [x]   |               [x]              |
@@ -25,7 +26,9 @@ This project contains several sequence alignment algorithms that can also produc
 ## Algorithms Explained
 [Needleman-Wunsch](https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm)
 
-[Gotoh -Global](https://helios2.mi.parisdescartes.fr/~lomn/Cours/BI/Material/gap-penalty-gotoh.pdf)
+[Gotoh (Global)](https://helios2.mi.parisdescartes.fr/~lomn/Cours/BI/Material/gap-penalty-gotoh.pdf)
+
+[Gotoh (Local)](http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Gotoh%20(Local))
 
 [Smith-Waterman ](https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm)
 
@@ -97,7 +100,6 @@ print(needleman_wunsch.matrix("AFTG","ACTG"))
 
 # Work In Progress
 
-Jaro and Jaro-Winkler algorithms.
 Importing and parsing FASTA, FASTQ, and PDB files.
 
 # Caveats

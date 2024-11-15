@@ -13,14 +13,11 @@ except ImportError:
     raise ImportError("Please pip install all dependencies from requirements.txt!")
 
 def main():
-    qqs = "GCATGCCAT"
-    sss = "CATGCATCGAC"
+    qqs = "WHORUNSTHEWORLDGIRLS"
+    sss = "DOGSSTHEWORLDEXUBERENT"
 
-    print(gotoh.align(qqs, sss))
-    print(gotoh.distance(qqs, sss))
-    print(gotoh.normalized_distance(qqs, sss))
-    print(gotoh.similarity(qqs, sss))
-
+    print(gotoh_local(qqs, sss)) 
+    print(gotoh_local.align(qqs, sss)) 
 
 class Wagner_Fischer(__GLOBALBASE): #Levenshtein Distance
     def __init__(self)->None:
@@ -312,7 +309,6 @@ class Gotoh(__GLOBALBASE):
         qs.extend([x.upper() for x in querySequence])
         ss.extend([x.upper() for x in subjectSequence])
 
-        #LETS GIVE POSITIVES A TRY FOR THE TESTS
         #matrix initialisation
         self.D = numpy.full((len(qs),len(ss)), numpy.inf)
         self.P = numpy.full((len(qs), len(ss)), numpy.inf)
@@ -378,6 +374,70 @@ class Gotoh(__GLOBALBASE):
         subjectAlign = "".join(subjectAlign[::-1])
 
         return f"{queryAlign}\n{subjectAlign}"
+
+class Gotoh_Local(__LOCALBASE):
+    def __init__(self, match_score:int = 1, mismatch_penalty:int = 1, new_gap_penalty:int = 2, continue_gap_penalty: int = 1)->None:
+        self.match_score = match_score
+        self.mismatch_penalty = mismatch_penalty
+        self.new_gap_penalty = new_gap_penalty
+        self.continue_gap_penalty = continue_gap_penalty
+
+    def __call__(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64],NDArray[float64],NDArray[float64]]:
+        qs,ss = [""], [""] 
+        qs.extend([x.upper() for x in querySequence])
+        ss.extend([x.upper() for x in subjectSequence])
+
+        #matrix initialisation
+        self.D = numpy.full((len(qs),len(ss)), -numpy.inf)
+        self.P = numpy.full((len(qs), len(ss)), -numpy.inf)
+        self.P[:,0] = 0
+        self.Q = numpy.full((len(qs), len(ss)), -numpy.inf)
+        self.Q[0,:] = 0
+        #initialisation of starter values for first column and first row
+        self.D[:,0] = 0
+        self.D[0,:] = 0
+
+        for i in range(1, len(qs)):
+          for j in range(1, len(ss)):
+              match = self.D[i - 1, j - 1] + (self.match_score if qs[i] == ss[j] else -self.mismatch_penalty)
+              self.P[i, j] = max(self.D[i - 1, j] - self.new_gap_penalty - self.continue_gap_penalty, self.P[i - 1, j] - self.continue_gap_penalty)
+              self.Q[i, j] = max(self.D[i, j - 1] - self.new_gap_penalty - self.continue_gap_penalty, self.Q[i, j - 1] - self.continue_gap_penalty)
+              self.D[i, j] = max(match, self.P[i, j], self.Q[i, j], 0)
+        return self.D, self.P, self.Q
+
+    def matrix(self, querySequence: str, subjectSequence: str)->tuple[NDArray[float64], NDArray[float64], NDArray[float64]]:
+        D, P, Q = self(querySequence, subjectSequence)
+        return D, P, Q
+
+    def align(self, querySequence: str, subjectSequence: str)->str:
+      matrix, _, _ = self(querySequence, subjectSequence)
+
+      qs, ss = [x.upper() for x in querySequence], [x.upper() for x in subjectSequence]
+      if matrix.max() == 0:
+        return "There is no local alignment!"
+
+      #finds the largest value closest to bottom right of matrix
+      i, j = list(numpy.where(matrix == matrix.max()))
+      i, j = i[-1], j[-1]
+
+      subjectAlign = []
+      queryAlign= []
+      score = matrix.max()
+      while score > 0:
+          score = matrix[i][j]
+          if score == 0:
+              break
+          queryAlign.append(qs[i-1])
+          subjectAlign.append(ss[j-1])
+          i -= 1
+          j -= 1
+      queryAlign = "".join(queryAlign[::-1])
+      subjectAlign = "".join(subjectAlign[::-1])
+      return f"{queryAlign}\n{subjectAlign}"
+
+    def similarity(self, querySequence: str, subjectSequence: str)->float:
+      matrix, _, _  = self(querySequence, subjectSequence)
+      return matrix.max()
 
 class Hirschberg():
     def __init__(self, match_score: int = 1, mismatch_penalty: int = -1, gap_penalty: int = -2)->None:
@@ -737,6 +797,7 @@ lowrance_wagner = Lowrance_Wagner()
 longest_common_subsequence = Longest_Common_Subsequence()
 shortest_common_supersequence = Shortest_Common_Supersequence()
 gotoh = Gotoh()
+gotoh_local = Gotoh_Local()
 
 if __name__ == "__main__":
     main()
