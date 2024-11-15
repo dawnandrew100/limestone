@@ -1,5 +1,5 @@
-# Limestone
-This project contains several sequence alignment algorithms that can also produce scoring matrices for Needleman-Wunsch, Smith-Waterman, Wagner-Fischer, Waterman-Smith-Beyer, Wagner-Fischer, Lowrance-Wagner, Longest Common Subsequence, and Shortest Common Supersequence algorithms. 
+# Goombay
+This project contains several sequence alignment algorithms that can also produce scoring matrices for Needleman-Wunsch, Gotoh, Smith-Waterman, Wagner-Fischer, Waterman-Smith-Beyer, Wagner-Fischer, Lowrance-Wagner, Longest Common Subsequence, and Shortest Common Supersequence algorithms. 
 
 ***Please ensure that numpy is installed so that this project can work correctly***
 
