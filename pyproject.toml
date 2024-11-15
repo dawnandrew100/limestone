@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "limestone"
+name = "goombay"
 version = "0.13.0"
 authors = [
 	{ name ="Andrew Hennis", email="andrew.mr.hennis@gmail.com" },
@@ -21,5 +21,5 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dawnandrew100/limestone"
-Issues = "https://github.com/dawnandrew100/limestone/issues"
+Homepage = "https://github.com/dawnandrew100/goombay"
+Issues = "https://github.com/dawnandrew100/goombay/issues"

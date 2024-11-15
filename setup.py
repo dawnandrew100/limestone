@@ -3,12 +3,12 @@
 from setuptools import setup
 
 setup(
-    name='limestone',
+    name='goombay',
     version='0.13.0',
 
-    packages=['limestone'],
+    packages=['goombay'],
     package_data={'': ['*.py']},
     python_requires='>=3.9',
 
-    url='https://github.com/dawnandrew100/limestone'
+    url='https://github.com/dawnandrew100/goombay'
 )
